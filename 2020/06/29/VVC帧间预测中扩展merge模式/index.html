@@ -6,15 +6,26 @@
   <meta name="renderer" content="webkit">
   <meta http-equiv="X-UA-Compatible" content="IE=edge" >
   <link rel="dns-prefetch" href="http://yoursite.com">
-  <title>Tag: 视频编码 | Cohen学长的博客</title>
+  <title>VVC帧间预测中扩展merge模式 | Cohen学长的博客</title>
   <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
-  <meta property="og:type" content="website">
-<meta property="og:title" content="Cohen学长的博客">
-<meta property="og:url" content="http://yoursite.com/tags/%E8%A7%86%E9%A2%91%E7%BC%96%E7%A0%81/index.html">
+  <meta property="og:type" content="article">
+<meta property="og:title" content="VVC帧间预测中扩展merge模式">
+<meta property="og:url" content="http://yoursite.com/2020/06/29/VVC%E5%B8%A7%E9%97%B4%E9%A2%84%E6%B5%8B%E4%B8%AD%E6%89%A9%E5%B1%95merge%E6%A8%A1%E5%BC%8F/index.html">
 <meta property="og:site_name" content="Cohen学长的博客">
 <meta property="og:locale" content="en_US">
+<meta property="og:image" content="https://raw.githubusercontent.com/jiabo-Cohen/Images/master/20200629170012.png">
+<meta property="og:image" content="https://raw.githubusercontent.com/jiabo-Cohen/Images/master/20200629123648.png">
+<meta property="og:image" content="https://raw.githubusercontent.com/jiabo-Cohen/Images/master/20200624161421.png">
+<meta property="og:image" content="https://raw.githubusercontent.com/jiabo-Cohen/Images/master/20200629133947.png">
+<meta property="og:image" content="https://raw.githubusercontent.com/jiabo-Cohen/Images/master/20200624163728.png">
+<meta property="og:image" content="https://raw.githubusercontent.com/jiabo-Cohen/Images/master/20200629135250.png">
+<meta property="og:image" content="https://raw.githubusercontent.com/jiabo-Cohen/Images/master/20200629140009.png">
+<meta property="article:published_time" content="2020-06-29T08:47:48.000Z">
+<meta property="article:modified_time" content="2020-06-29T09:01:26.838Z">
 <meta property="article:author" content="Cohen 学长">
+<meta property="article:tag" content="视频编码">
 <meta name="twitter:card" content="summary">
+<meta name="twitter:image" content="https://raw.githubusercontent.com/jiabo-Cohen/Images/master/20200629170012.png">
   
     <link rel="alternative" href="/atom.xml" title="Cohen学长的博客" type="application/atom+xml">
   
@@ -175,36 +186,123 @@
           </div>
           <div id="js-content" class="content-ll">
             
+<article id="post-VVC帧间预测中扩展merge模式" class="article article-type-post " itemscope itemprop="blogPost">
+  <div class="article-inner">
+    
+      <header class="article-header">
+        
   
+    <h1 class="article-title" itemprop="name">
+      VVC帧间预测中扩展merge模式
+    </h1>
   
-    
-    
-      
-      
-      <section class="archives-wrap">
-        <div class="archive-year-wrap">
-          <a href="/archives/2020" class="archive-year">2020</a>
-        </div>
-        <div class="archives">
-    
-    <article class="archive-article archive-type-post">
-  <div class="archive-article-inner">
-    <header class="archive-article-header">
-      	<div class="article-meta">
-	      	
+
+        
+        
+	<!-- 不蒜子统计 -->
+	<span id="busuanzi_container_page_pv" style='display:none' class="archive-article-date">
+		  <i class="icon-smile icon"></i> 阅读数：<span id="busuanzi_value_page_pv"></span>次
+	</span>
+
 <a href="/2020/06/29/VVC%E5%B8%A7%E9%97%B4%E9%A2%84%E6%B5%8B%E4%B8%AD%E6%89%A9%E5%B1%95merge%E6%A8%A1%E5%BC%8F/" class="archive-article-date">
   	<time datetime="2020-06-29T08:47:48.000Z" itemprop="datePublished"><i class="icon-calendar icon"></i>2020-06-29</time>
 </a>
-        </div>
-    	 
-  
-    <h1 itemprop="name">
-      <a class="archive-article-title" href="/2020/06/29/VVC%E5%B8%A7%E9%97%B4%E9%A2%84%E6%B5%8B%E4%B8%AD%E6%89%A9%E5%B1%95merge%E6%A8%A1%E5%BC%8F/">VVC帧间预测中扩展merge模式</a>
-    </h1>
-  
+        
+      </header>
+    
+    <div class="article-entry" itemprop="articleBody">
+      
+        <div align=center><img width="600" height="350" src="https://raw.githubusercontent.com/jiabo-Cohen/Images/master/20200629170012.png"></div>
 
-        <div class="article-info info-on-right">
-          
+<a id="more"></a>
+
+<h2 id="扩展的Mrege模式"><a href="#扩展的Mrege模式" class="headerlink" title="扩展的Mrege模式"></a>扩展的Mrege模式</h2><p>merge是在HEVC中提出的一种MV预测技术，利用时域和空域相邻块的MV对当前块的MV进行预测。HEVC中merge模式会为当前PU建立一个MV候选列表，列表中有5个候选列表，通过遍历这5个MV，计算率失真代价值最小的MV作为当前PU的MV，并在编码是编码该MV在候选列表中的索引值，解码端通过相同的方式构建候选列表，通过索引值就可以获得该MV。</p>
+<p>HEVC中利用时域和空域相邻块构建MV列表，且列表中只有5个候选MV，VVC对此进行了扩展，候选类表merge list中最多可以有6个候选MV，候选MV有以下5中类型，构造的顺序如下图所示：</p>
+<div align=center><img width="250" height="250" src="https://raw.githubusercontent.com/jiabo-Cohen/Images/master/20200629123648.png"></div>
+
+<h3 id="一、空域候选列表构建"><a href="#一、空域候选列表构建" class="headerlink" title="一、空域候选列表构建"></a>一、空域候选列表构建</h3><p>空域候选列表的建立方式和HEVC中一样，如下图所示，B、C、D、E、F是当前编码块A的相邻块。VVC中空域最多提供4个候选MV。即最多使用这5个候选块中的4个候选块的运动信息，候选列表按照B、C、D、E、F的顺序建立，其中F是替补，只有前4个相邻块有一个或者多个不存在时（例如不在同一个Slice或者Tlie或者使用帧内编码时）才将F加入候选列表。当候选列表中加入B之后，后面新加入候选项时需要进行冗余性检验，以免新加入的候选项的运动信息和已有项相同。同时，为了减少计算复杂度，冗余性检查不会和已有的每一项进行比较，比较的方式如下面第二张图所示</p>
+<div align=center><img width="250" height="250" src="https://raw.githubusercontent.com/jiabo-Cohen/Images/master/20200624161421.png"></div>
+<div align=center><img width="300" height="200" src="https://raw.githubusercontent.com/jiabo-Cohen/Images/master/20200629133947.png"></div>
+
+<h3 id="二、时域候选列表的构建"><a href="#二、时域候选列表的构建" class="headerlink" title="二、时域候选列表的构建"></a>二、时域候选列表的构建</h3><p>时域候选列表的构建方式和HEVC一样，与空域的构建方式不一样，时域候选列表不能直接使用候选块的运动信息，需要根据位置关系进行相应比例地伸缩。如下图所示</p>
+<div align=center><img width="400" height="300" src="https://raw.githubusercontent.com/jiabo-Cohen/Images/master/20200624163728.png"></div>
+
+<p>其中tb表示当前图像和参考图像之间的距离（用POC度量），td是同位图像和其参考图像之间的距离。时域最多提供一个MV，计算方法如下所示：</p>
+<div align=center><img width="276" height="56" src="https://raw.githubusercontent.com/jiabo-Cohen/Images/master/20200629135250.png"></div>
+
+<p>如下图C0位置的候选MV由其同位CU的MV伸缩得到，如果C0的同位MV不可用，则用C1的同位CU的MV代替</p>
+<div align=center><img width="400" height="300" src="https://raw.githubusercontent.com/jiabo-Cohen/Images/master/20200629140009.png"></div>
+
+<h3 id="三、基于历史信息构建MVP-HMVP"><a href="#三、基于历史信息构建MVP-HMVP" class="headerlink" title="三、基于历史信息构建MVP(HMVP)"></a>三、基于历史信息构建MVP(HMVP)</h3><p>​    HMVP的merge候选项在空域候选和时域候选之后加入merge候选列表。HMVP候选项来自于一个先进先出的表，这个表通过已经编码块的运动信息构建，每到新的一行CTU时，这个表就要重置，即清空操作。每遇到一个帧间编码的CU（非子块）时，它相关的运动信息就会加到这个表的最后一项成为一个新的HMVP候选项。</p>
+<p>​    在VTM5中，HMVP表的大小为6。每当插入一个新的候选项时，首先要进行冗余性检查即检查待插入的项的运动信息和表中已有项的运动信息是否相同，如果不相同，则按照先进先出的规则进行插入操作；如果相同，则将相同的HMVP从维护的FIFO（先进先出）表中移除，其后所有的项都向前移动一位。</p>
+<p>​    HMVP表构建好了之后，就可以将其中的HMVP候选项插入merge list中，对HMVP表中的候选项进行冗余性检查（即检查该项和merge list中的空域、时域候选项运动信息是否相同），检查通过即插入merge list中。</p>
+<p>为了减少冗余性检查操作，进行了一下的简化操作：</p>
+<ul>
+<li>用于构建merge list的HMVP候选项数量设为 （N&lt;=4)?M:(8-N)，其中N表示merge list中已有项的数目，M表示HMVP表中候选项数目</li>
+<li>一旦merge list中候选项的数目达到了最大允许候选项数目减一（即6-1=5），则停止从HMVP生成merge候选项的过程</li>
+</ul>
+<h3 id="四、逐对的平均MVP"><a href="#四、逐对的平均MVP" class="headerlink" title="四、逐对的平均MVP"></a>四、逐对的平均MVP</h3><p>​    逐对平均候选项是指对merge list中的已有候选项按照预定义的组队关系计算平均值，预定义的最对关系为：</p>
+<p>{(0,1),(0,2),(1,2),(0,3),(1,3),(2,3)}，这里面的数字代表候选项在merge list中的索引值。L0和L1的平均向量分别单独计算，如果两个向量在某个列表中都有效则即使它们指向不同的参考图像也计算它们的平均，如果只有一个想来那个在某个列表中有效则直接它，如果某个列表中没有有效运动向量则该类表无效。</p>
+<h3 id="五、零向量"><a href="#五、零向量" class="headerlink" title="五、零向量"></a>五、零向量</h3><p>​    如果在计算完平均候选项之后 merge list还没有被填满，则用零向量把merge list填满</p>
+<h3 id="六、总结"><a href="#六、总结" class="headerlink" title="六、总结"></a>六、总结</h3><p>​    以上五步就是merge list的构建过程，merge list的列表长度为3，首选寻找空域候选项（最多选择4个），然后寻找时域候选项（最多选择一个），然后选择基于历史信息的候选项，最后是平均候选项，如果merge list通过以上几个步骤，还未被填满，则使用两向量进行填充。在上面这些步骤当中，如果在中途某个步骤当中merge list被填满则，不进行后面的步骤。</p>
+<ul>
+<li>VVC中的merge list构建与HEVC中merge list构建最大的不同在于，HEVC中的merge list只包括空域候选项和时域候选项</li>
+<li>当前CU的merge list构建完毕后，遍历它的6个候选项进行率失真代价计算，选择率失真代价最小的候选项直接作为当前CU的MV</li>
+</ul>
+<h3 id="七、代码分析"><a href="#七、代码分析" class="headerlink" title="七、代码分析"></a>七、代码分析</h3><p><strong>该文件所在位置</strong></p>
+<p><strong>CommonLib-&gt;Source Files-&gt;PU-&gt;getInterMergeCandidates(……)</strong></p>
+<figure class="highlight cpp"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br><span class="line">48</span><br><span class="line">49</span><br><span class="line">50</span><br><span class="line">51</span><br><span class="line">52</span><br><span class="line">53</span><br><span class="line">54</span><br><span class="line">55</span><br><span class="line">56</span><br><span class="line">57</span><br><span class="line">58</span><br><span class="line">59</span><br><span class="line">60</span><br><span class="line">61</span><br><span class="line">62</span><br><span class="line">63</span><br><span class="line">64</span><br><span class="line">65</span><br><span class="line">66</span><br><span class="line">67</span><br><span class="line">68</span><br><span class="line">69</span><br><span class="line">70</span><br><span class="line">71</span><br><span class="line">72</span><br><span class="line">73</span><br><span class="line">74</span><br><span class="line">75</span><br><span class="line">76</span><br><span class="line">77</span><br><span class="line">78</span><br><span class="line">79</span><br><span class="line">80</span><br><span class="line">81</span><br><span class="line">82</span><br><span class="line">83</span><br><span class="line">84</span><br><span class="line">85</span><br><span class="line">86</span><br><span class="line">87</span><br><span class="line">88</span><br><span class="line">89</span><br><span class="line">90</span><br><span class="line">91</span><br><span class="line">92</span><br><span class="line">93</span><br><span class="line">94</span><br><span class="line">95</span><br><span class="line">96</span><br><span class="line">97</span><br><span class="line">98</span><br><span class="line">99</span><br><span class="line">100</span><br><span class="line">101</span><br><span class="line">102</span><br><span class="line">103</span><br><span class="line">104</span><br><span class="line">105</span><br><span class="line">106</span><br><span class="line">107</span><br><span class="line">108</span><br><span class="line">109</span><br><span class="line">110</span><br><span class="line">111</span><br><span class="line">112</span><br><span class="line">113</span><br><span class="line">114</span><br><span class="line">115</span><br><span class="line">116</span><br><span class="line">117</span><br><span class="line">118</span><br><span class="line">119</span><br><span class="line">120</span><br><span class="line">121</span><br><span class="line">122</span><br><span class="line">123</span><br><span class="line">124</span><br><span class="line">125</span><br><span class="line">126</span><br><span class="line">127</span><br><span class="line">128</span><br><span class="line">129</span><br><span class="line">130</span><br><span class="line">131</span><br><span class="line">132</span><br><span class="line">133</span><br><span class="line">134</span><br><span class="line">135</span><br><span class="line">136</span><br><span class="line">137</span><br><span class="line">138</span><br><span class="line">139</span><br><span class="line">140</span><br><span class="line">141</span><br><span class="line">142</span><br><span class="line">143</span><br><span class="line">144</span><br><span class="line">145</span><br><span class="line">146</span><br><span class="line">147</span><br><span class="line">148</span><br><span class="line">149</span><br><span class="line">150</span><br><span class="line">151</span><br><span class="line">152</span><br><span class="line">153</span><br><span class="line">154</span><br><span class="line">155</span><br><span class="line">156</span><br><span class="line">157</span><br><span class="line">158</span><br><span class="line">159</span><br><span class="line">160</span><br><span class="line">161</span><br><span class="line">162</span><br><span class="line">163</span><br><span class="line">164</span><br><span class="line">165</span><br><span class="line">166</span><br><span class="line">167</span><br><span class="line">168</span><br><span class="line">169</span><br><span class="line">170</span><br><span class="line">171</span><br><span class="line">172</span><br><span class="line">173</span><br><span class="line">174</span><br><span class="line">175</span><br><span class="line">176</span><br><span class="line">177</span><br><span class="line">178</span><br><span class="line">179</span><br><span class="line">180</span><br><span class="line">181</span><br><span class="line">182</span><br><span class="line">183</span><br><span class="line">184</span><br><span class="line">185</span><br><span class="line">186</span><br><span class="line">187</span><br><span class="line">188</span><br><span class="line">189</span><br><span class="line">190</span><br><span class="line">191</span><br><span class="line">192</span><br><span class="line">193</span><br><span class="line">194</span><br><span class="line">195</span><br><span class="line">196</span><br><span class="line">197</span><br><span class="line">198</span><br><span class="line">199</span><br><span class="line">200</span><br><span class="line">201</span><br><span class="line">202</span><br><span class="line">203</span><br><span class="line">204</span><br><span class="line">205</span><br><span class="line">206</span><br><span class="line">207</span><br><span class="line">208</span><br><span class="line">209</span><br><span class="line">210</span><br><span class="line">211</span><br><span class="line">212</span><br><span class="line">213</span><br><span class="line">214</span><br><span class="line">215</span><br><span class="line">216</span><br><span class="line">217</span><br><span class="line">218</span><br><span class="line">219</span><br><span class="line">220</span><br><span class="line">221</span><br><span class="line">222</span><br><span class="line">223</span><br><span class="line">224</span><br><span class="line">225</span><br><span class="line">226</span><br><span class="line">227</span><br><span class="line">228</span><br><span class="line">229</span><br><span class="line">230</span><br><span class="line">231</span><br><span class="line">232</span><br><span class="line">233</span><br><span class="line">234</span><br><span class="line">235</span><br><span class="line">236</span><br><span class="line">237</span><br><span class="line">238</span><br><span class="line">239</span><br><span class="line">240</span><br><span class="line">241</span><br><span class="line">242</span><br><span class="line">243</span><br><span class="line">244</span><br><span class="line">245</span><br><span class="line">246</span><br><span class="line">247</span><br><span class="line">248</span><br><span class="line">249</span><br><span class="line">250</span><br><span class="line">251</span><br><span class="line">252</span><br><span class="line">253</span><br><span class="line">254</span><br><span class="line">255</span><br><span class="line">256</span><br><span class="line">257</span><br><span class="line">258</span><br><span class="line">259</span><br><span class="line">260</span><br><span class="line">261</span><br><span class="line">262</span><br><span class="line">263</span><br><span class="line">264</span><br><span class="line">265</span><br><span class="line">266</span><br><span class="line">267</span><br><span class="line">268</span><br><span class="line">269</span><br><span class="line">270</span><br><span class="line">271</span><br><span class="line">272</span><br><span class="line">273</span><br><span class="line">274</span><br><span class="line">275</span><br><span class="line">276</span><br><span class="line">277</span><br><span class="line">278</span><br><span class="line">279</span><br><span class="line">280</span><br><span class="line">281</span><br><span class="line">282</span><br><span class="line">283</span><br><span class="line">284</span><br><span class="line">285</span><br><span class="line">286</span><br><span class="line">287</span><br><span class="line">288</span><br><span class="line">289</span><br><span class="line">290</span><br><span class="line">291</span><br><span class="line">292</span><br><span class="line">293</span><br><span class="line">294</span><br><span class="line">295</span><br><span class="line">296</span><br><span class="line">297</span><br><span class="line">298</span><br><span class="line">299</span><br><span class="line">300</span><br><span class="line">301</span><br><span class="line">302</span><br><span class="line">303</span><br><span class="line">304</span><br><span class="line">305</span><br><span class="line">306</span><br><span class="line">307</span><br><span class="line">308</span><br><span class="line">309</span><br><span class="line">310</span><br><span class="line">311</span><br><span class="line">312</span><br><span class="line">313</span><br><span class="line">314</span><br><span class="line">315</span><br><span class="line">316</span><br><span class="line">317</span><br><span class="line">318</span><br><span class="line">319</span><br><span class="line">320</span><br><span class="line">321</span><br><span class="line">322</span><br><span class="line">323</span><br><span class="line">324</span><br><span class="line">325</span><br><span class="line">326</span><br><span class="line">327</span><br><span class="line">328</span><br><span class="line">329</span><br><span class="line">330</span><br><span class="line">331</span><br><span class="line">332</span><br><span class="line">333</span><br><span class="line">334</span><br><span class="line">335</span><br><span class="line">336</span><br><span class="line">337</span><br><span class="line">338</span><br><span class="line">339</span><br><span class="line">340</span><br><span class="line">341</span><br><span class="line">342</span><br><span class="line">343</span><br><span class="line">344</span><br><span class="line">345</span><br><span class="line">346</span><br><span class="line">347</span><br><span class="line">348</span><br><span class="line">349</span><br><span class="line">350</span><br><span class="line">351</span><br><span class="line">352</span><br><span class="line">353</span><br><span class="line">354</span><br><span class="line">355</span><br><span class="line">356</span><br><span class="line">357</span><br><span class="line">358</span><br><span class="line">359</span><br><span class="line">360</span><br><span class="line">361</span><br><span class="line">362</span><br><span class="line">363</span><br><span class="line">364</span><br><span class="line">365</span><br><span class="line">366</span><br><span class="line">367</span><br><span class="line">368</span><br><span class="line">369</span><br><span class="line">370</span><br><span class="line">371</span><br><span class="line">372</span><br><span class="line">373</span><br><span class="line">374</span><br><span class="line">375</span><br><span class="line">376</span><br><span class="line">377</span><br><span class="line">378</span><br><span class="line">379</span><br><span class="line">380</span><br><span class="line">381</span><br><span class="line">382</span><br><span class="line">383</span><br><span class="line">384</span><br><span class="line">385</span><br><span class="line">386</span><br><span class="line">387</span><br><span class="line">388</span><br><span class="line">389</span><br><span class="line">390</span><br><span class="line">391</span><br><span class="line">392</span><br><span class="line">393</span><br><span class="line">394</span><br><span class="line">395</span><br><span class="line">396</span><br><span class="line">397</span><br><span class="line">398</span><br><span class="line">399</span><br><span class="line">400</span><br><span class="line">401</span><br><span class="line">402</span><br><span class="line">403</span><br><span class="line">404</span><br><span class="line">405</span><br><span class="line">406</span><br><span class="line">407</span><br><span class="line">408</span><br><span class="line">409</span><br><span class="line">410</span><br><span class="line">411</span><br><span class="line">412</span><br><span class="line">413</span><br><span class="line">414</span><br></pre></td><td class="code"><pre><span class="line"><span class="function"><span class="keyword">void</span> <span class="title">PU::getInterMergeCandidates</span><span class="params">( <span class="keyword">const</span> PredictionUnit &amp;pu, MergeCtx&amp; mrgCtx,</span></span></span><br><span class="line"><span class="function"><span class="params">                                 <span class="keyword">int</span> mmvdList,</span></span></span><br><span class="line"><span class="function"><span class="params">                                 <span class="keyword">const</span> <span class="keyword">int</span>&amp; mrgCandIdx )</span></span></span><br><span class="line"><span class="function"></span>&#123;</span><br><span class="line">  <span class="keyword">const</span> CodingStructure &amp;cs  = *pu.cs;    <span class="comment">//当前CU所处的编码结构Slice or Tile </span></span><br><span class="line">  <span class="keyword">const</span> Slice &amp;slice         = *pu.cs-&gt;slice;   <span class="comment">//当前PU中的Slice</span></span><br><span class="line">  <span class="keyword">const</span> <span class="keyword">uint32_t</span> maxNumMergeCand = slice.getPicHeader()-&gt;getMaxNumMergeCand();  <span class="comment">//该变量表示Merge候选列表的最大长度</span></span><br><span class="line"></span><br><span class="line">  <span class="keyword">for</span> (<span class="keyword">uint32_t</span> ui = <span class="number">0</span>; ui &lt; maxNumMergeCand; ++ui)</span><br><span class="line">  &#123;</span><br><span class="line">    mrgCtx.BcwIdx[ui] = BCW_DEFAULT;</span><br><span class="line">    mrgCtx.interDirNeighbours[ui] = <span class="number">0</span>;</span><br><span class="line">    mrgCtx.mrgTypeNeighbours [ui] = MRG_TYPE_DEFAULT_N;</span><br><span class="line">    mrgCtx.mvFieldNeighbours[(ui &lt;&lt; <span class="number">1</span>)    ].refIdx = NOT_VALID;</span><br><span class="line">    mrgCtx.mvFieldNeighbours[(ui &lt;&lt; <span class="number">1</span>) + <span class="number">1</span>].refIdx = NOT_VALID;</span><br><span class="line">    mrgCtx.useAltHpelIf[ui] = <span class="literal">false</span>;</span><br><span class="line">  &#125;</span><br><span class="line"></span><br><span class="line">  mrgCtx.numValidMergeCand = maxNumMergeCand;</span><br><span class="line">  <span class="comment">// compute the location of the current PU 计算当前PU的位置</span></span><br><span class="line"></span><br><span class="line">  <span class="keyword">int</span> cnt = <span class="number">0</span>;   <span class="comment">//该变量用于记录当前Merge候选列表中MV的个数</span></span><br><span class="line"></span><br><span class="line">  <span class="keyword">const</span> Position posLT = pu.Y().topLeft();  <span class="comment">//当前PU左上方的位置</span></span><br><span class="line">  <span class="keyword">const</span> Position posRT = pu.Y().topRight(); <span class="comment">//当前PU右上方的位置</span></span><br><span class="line">  <span class="keyword">const</span> Position posLB = pu.Y().bottomLeft();  <span class="comment">//当前PU左下方的位置</span></span><br><span class="line">  MotionInfo miAbove, miLeft, miAboveLeft, miAboveRight, miBelowLeft;   <span class="comment">//记录当前PU5个相邻块的运动信息</span></span><br><span class="line"></span><br><span class="line">  <span class="comment">//1. above   检查邻块C运动信息是否可用</span></span><br><span class="line">  <span class="keyword">const</span> PredictionUnit *puAbove = cs.getPURestricted(posRT.offset(<span class="number">0</span>, <span class="number">-1</span>), pu, pu.chType);</span><br><span class="line"></span><br><span class="line">  <span class="keyword">bool</span> isAvailableB1 = puAbove &amp;&amp; isDiffMER(pu, *puAbove) &amp;&amp; pu.cu != puAbove-&gt;cu &amp;&amp; CU::isInter(*puAbove-&gt;cu);</span><br><span class="line"></span><br><span class="line">  <span class="keyword">if</span> (isAvailableB1)</span><br><span class="line">  &#123;</span><br><span class="line">    miAbove = puAbove-&gt;getMotionInfo(posRT.offset(<span class="number">0</span>, <span class="number">-1</span>));</span><br><span class="line"></span><br><span class="line">    <span class="comment">// get Inter Dir</span></span><br><span class="line">    mrgCtx.interDirNeighbours[cnt] = miAbove.interDir;   <span class="comment">//该变量表示merge list中已候选项的数目</span></span><br><span class="line">    mrgCtx.useAltHpelIf[cnt] = miAbove.useAltHpelIf;</span><br><span class="line">    <span class="comment">// get Mv from Above从右上方块获得运动矢量</span></span><br><span class="line">    mrgCtx.BcwIdx[cnt] = (mrgCtx.interDirNeighbours[cnt] == <span class="number">3</span>) ? puAbove-&gt;cu-&gt;BcwIdx : BCW_DEFAULT;   <span class="comment">//，puAbove-&gt;cu-&gt;BcwIdx表示当前PU所属的CU维护的HMVP表中候选数目</span></span><br><span class="line">    mrgCtx.mvFieldNeighbours[cnt &lt;&lt; <span class="number">1</span>].setMvField(miAbove.mv[<span class="number">0</span>], miAbove.refIdx[<span class="number">0</span>]);</span><br><span class="line"></span><br><span class="line">    <span class="keyword">if</span> (slice.isInterB())</span><br><span class="line">    &#123;</span><br><span class="line">      mrgCtx.mvFieldNeighbours[(cnt &lt;&lt; <span class="number">1</span>) + <span class="number">1</span>].setMvField(miAbove.mv[<span class="number">1</span>], miAbove.refIdx[<span class="number">1</span>]);</span><br><span class="line">    &#125;</span><br><span class="line">    <span class="keyword">if</span> (mrgCandIdx == cnt)</span><br><span class="line">    &#123;</span><br><span class="line">      <span class="keyword">return</span>;</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    cnt++;</span><br><span class="line">  &#125;</span><br><span class="line"></span><br><span class="line">  <span class="comment">// early termination   如果当前merge list中候选的数目已经达到了最大值，则停止merge list列表的构建</span></span><br><span class="line">  <span class="keyword">if</span> (cnt == maxNumMergeCand)</span><br><span class="line">  &#123;</span><br><span class="line">    <span class="keyword">return</span>;</span><br><span class="line">  &#125;</span><br><span class="line"></span><br><span class="line">  <span class="comment">//2.left    检查邻块B运动信息是否可用</span></span><br><span class="line">  <span class="keyword">const</span> PredictionUnit* puLeft = cs.getPURestricted(posLB.offset(<span class="number">-1</span>, <span class="number">0</span>), pu, pu.chType);</span><br><span class="line"></span><br><span class="line">  <span class="keyword">const</span> <span class="keyword">bool</span> isAvailableA1 = puLeft &amp;&amp; isDiffMER(pu, *puLeft) &amp;&amp; pu.cu != puLeft-&gt;cu &amp;&amp; CU::isInter(*puLeft-&gt;cu);</span><br><span class="line"></span><br><span class="line">  <span class="keyword">if</span> (isAvailableA1)</span><br><span class="line">  &#123;</span><br><span class="line">    miLeft = puLeft-&gt;getMotionInfo(posLB.offset(<span class="number">-1</span>, <span class="number">0</span>));</span><br><span class="line"></span><br><span class="line">    <span class="keyword">if</span> (!isAvailableB1 || (miAbove != miLeft))</span><br><span class="line">    &#123;</span><br><span class="line">      <span class="comment">// get Inter Dir</span></span><br><span class="line">      mrgCtx.interDirNeighbours[cnt] = miLeft.interDir;</span><br><span class="line">      mrgCtx.useAltHpelIf[cnt] = miLeft.useAltHpelIf;</span><br><span class="line">      mrgCtx.BcwIdx[cnt] = (mrgCtx.interDirNeighbours[cnt] == <span class="number">3</span>) ? puLeft-&gt;cu-&gt;BcwIdx : BCW_DEFAULT;</span><br><span class="line">      <span class="comment">// get Mv from Left</span></span><br><span class="line">      mrgCtx.mvFieldNeighbours[cnt &lt;&lt; <span class="number">1</span>].setMvField(miLeft.mv[<span class="number">0</span>], miLeft.refIdx[<span class="number">0</span>]);</span><br><span class="line"></span><br><span class="line">      <span class="keyword">if</span> (slice.isInterB())</span><br><span class="line">      &#123;</span><br><span class="line">        mrgCtx.mvFieldNeighbours[(cnt &lt;&lt; <span class="number">1</span>) + <span class="number">1</span>].setMvField(miLeft.mv[<span class="number">1</span>], miLeft.refIdx[<span class="number">1</span>]);</span><br><span class="line">      &#125;</span><br><span class="line">      <span class="keyword">if</span> (mrgCandIdx == cnt)</span><br><span class="line">      &#123;</span><br><span class="line">        <span class="keyword">return</span>;</span><br><span class="line">      &#125;</span><br><span class="line"></span><br><span class="line">      cnt++;</span><br><span class="line">    &#125;</span><br><span class="line">  &#125;</span><br><span class="line"></span><br><span class="line">  <span class="comment">// early termination</span></span><br><span class="line">  <span class="keyword">if</span>( cnt == maxNumMergeCand )</span><br><span class="line">  &#123;</span><br><span class="line">    <span class="keyword">return</span>;</span><br><span class="line">  &#125;</span><br><span class="line"></span><br><span class="line">  <span class="comment">//3. above right   检查邻块D运动信息是否可用</span></span><br><span class="line">  <span class="keyword">const</span> PredictionUnit *puAboveRight = cs.getPURestricted( posRT.offset( <span class="number">1</span>, <span class="number">-1</span> ), pu, pu.chType );</span><br><span class="line"></span><br><span class="line">  <span class="keyword">bool</span> isAvailableB0 = puAboveRight &amp;&amp; isDiffMER( pu, *puAboveRight ) &amp;&amp; CU::isInter( *puAboveRight-&gt;cu );</span><br><span class="line"></span><br><span class="line">  <span class="keyword">if</span>( isAvailableB0 )</span><br><span class="line">  &#123;</span><br><span class="line">    miAboveRight = puAboveRight-&gt;getMotionInfo( posRT.offset( <span class="number">1</span>, <span class="number">-1</span> ) );</span><br><span class="line"></span><br><span class="line">    <span class="keyword">if</span>( !isAvailableB1 || ( miAbove != miAboveRight ) )</span><br><span class="line">    &#123;</span><br><span class="line"></span><br><span class="line">      <span class="comment">// get Inter Dir</span></span><br><span class="line">      mrgCtx.interDirNeighbours[cnt] = miAboveRight.interDir;</span><br><span class="line">      mrgCtx.useAltHpelIf[cnt] = miAboveRight.useAltHpelIf;</span><br><span class="line">      <span class="comment">// get Mv from Above-right</span></span><br><span class="line">      mrgCtx.BcwIdx[cnt] = (mrgCtx.interDirNeighbours[cnt] == <span class="number">3</span>) ? puAboveRight-&gt;cu-&gt;BcwIdx : BCW_DEFAULT;</span><br><span class="line">      mrgCtx.mvFieldNeighbours[cnt &lt;&lt; <span class="number">1</span>].setMvField( miAboveRight.mv[<span class="number">0</span>], miAboveRight.refIdx[<span class="number">0</span>] );</span><br><span class="line"></span><br><span class="line">      <span class="keyword">if</span>( slice.isInterB() )</span><br><span class="line">      &#123;</span><br><span class="line">        mrgCtx.mvFieldNeighbours[( cnt &lt;&lt; <span class="number">1</span> ) + <span class="number">1</span>].setMvField( miAboveRight.mv[<span class="number">1</span>], miAboveRight.refIdx[<span class="number">1</span>] );</span><br><span class="line">      &#125;</span><br><span class="line"></span><br><span class="line">      <span class="keyword">if</span> (mrgCandIdx == cnt)</span><br><span class="line">      &#123;</span><br><span class="line">        <span class="keyword">return</span>;</span><br><span class="line">      &#125;</span><br><span class="line"></span><br><span class="line">      cnt++;</span><br><span class="line">    &#125;</span><br><span class="line">  &#125;</span><br><span class="line">  <span class="comment">// early termination</span></span><br><span class="line">  <span class="keyword">if</span>( cnt == maxNumMergeCand )</span><br><span class="line">  &#123;</span><br><span class="line">    <span class="keyword">return</span>;</span><br><span class="line">  &#125;</span><br><span class="line"></span><br><span class="line">  <span class="comment">//4.left bottom检查邻块E运动信息是否可用</span></span><br><span class="line">  <span class="keyword">const</span> PredictionUnit *puLeftBottom = cs.getPURestricted( posLB.offset( <span class="number">-1</span>, <span class="number">1</span> ), pu, pu.chType );</span><br><span class="line"></span><br><span class="line">  <span class="keyword">bool</span> isAvailableA0 = puLeftBottom &amp;&amp; isDiffMER( pu, *puLeftBottom ) &amp;&amp; CU::isInter( *puLeftBottom-&gt;cu );</span><br><span class="line"></span><br><span class="line">  <span class="keyword">if</span>( isAvailableA0 )</span><br><span class="line">  &#123;</span><br><span class="line">    miBelowLeft = puLeftBottom-&gt;getMotionInfo( posLB.offset( <span class="number">-1</span>, <span class="number">1</span> ) );</span><br><span class="line"></span><br><span class="line">    <span class="keyword">if</span>( !isAvailableA1 || ( miBelowLeft != miLeft ) )</span><br><span class="line">    &#123;</span><br><span class="line"></span><br><span class="line">      <span class="comment">// get Inter Dir</span></span><br><span class="line">      mrgCtx.interDirNeighbours[cnt] = miBelowLeft.interDir;</span><br><span class="line">      mrgCtx.useAltHpelIf[cnt] = miBelowLeft.useAltHpelIf;</span><br><span class="line">      mrgCtx.BcwIdx[cnt] = (mrgCtx.interDirNeighbours[cnt] == <span class="number">3</span>) ? puLeftBottom-&gt;cu-&gt;BcwIdx : BCW_DEFAULT;</span><br><span class="line">      <span class="comment">// get Mv from Bottom-Left</span></span><br><span class="line">      mrgCtx.mvFieldNeighbours[cnt &lt;&lt; <span class="number">1</span>].setMvField( miBelowLeft.mv[<span class="number">0</span>], miBelowLeft.refIdx[<span class="number">0</span>] );</span><br><span class="line"></span><br><span class="line">      <span class="keyword">if</span>( slice.isInterB() )</span><br><span class="line">      &#123;</span><br><span class="line">        mrgCtx.mvFieldNeighbours[( cnt &lt;&lt; <span class="number">1</span> ) + <span class="number">1</span>].setMvField( miBelowLeft.mv[<span class="number">1</span>], miBelowLeft.refIdx[<span class="number">1</span>] );</span><br><span class="line">      &#125;</span><br><span class="line"></span><br><span class="line">      <span class="keyword">if</span> (mrgCandIdx == cnt)</span><br><span class="line">      &#123;</span><br><span class="line">        <span class="keyword">return</span>;</span><br><span class="line">      &#125;</span><br><span class="line"></span><br><span class="line">      cnt++;</span><br><span class="line">    &#125;</span><br><span class="line">  &#125;</span><br><span class="line">  <span class="comment">// early termination</span></span><br><span class="line">  <span class="keyword">if</span>( cnt == maxNumMergeCand )</span><br><span class="line">  &#123;</span><br><span class="line">    <span class="keyword">return</span>;</span><br><span class="line">  &#125;</span><br><span class="line"></span><br><span class="line"></span><br><span class="line">  <span class="comment">// 5.above left  当空域候选cnt不够时，检查邻块F运动信息是否可用</span></span><br><span class="line">  <span class="keyword">if</span> ( cnt &lt; <span class="number">4</span> )</span><br><span class="line">  &#123;</span><br><span class="line">    <span class="keyword">const</span> PredictionUnit *puAboveLeft = cs.getPURestricted( posLT.offset( <span class="number">-1</span>, <span class="number">-1</span> ), pu, pu.chType );</span><br><span class="line"></span><br><span class="line">    <span class="keyword">bool</span> isAvailableB2 = puAboveLeft &amp;&amp; isDiffMER( pu, *puAboveLeft ) &amp;&amp; CU::isInter( *puAboveLeft-&gt;cu );</span><br><span class="line"></span><br><span class="line">    <span class="keyword">if</span>( isAvailableB2 )</span><br><span class="line">    &#123;</span><br><span class="line">      miAboveLeft = puAboveLeft-&gt;getMotionInfo( posLT.offset( <span class="number">-1</span>, <span class="number">-1</span> ) );</span><br><span class="line"></span><br><span class="line">      <span class="keyword">if</span>( ( !isAvailableA1 || ( miLeft != miAboveLeft ) ) &amp;&amp; ( !isAvailableB1 || ( miAbove != miAboveLeft ) ) )</span><br><span class="line">      &#123;</span><br><span class="line"></span><br><span class="line">        <span class="comment">// get Inter Dir</span></span><br><span class="line">        mrgCtx.interDirNeighbours[cnt] = miAboveLeft.interDir;</span><br><span class="line">        mrgCtx.useAltHpelIf[cnt] = miAboveLeft.useAltHpelIf;</span><br><span class="line">        mrgCtx.BcwIdx[cnt] = (mrgCtx.interDirNeighbours[cnt] == <span class="number">3</span>) ? puAboveLeft-&gt;cu-&gt;BcwIdx : BCW_DEFAULT;</span><br><span class="line">        <span class="comment">// get Mv from Above-Left</span></span><br><span class="line">        mrgCtx.mvFieldNeighbours[cnt &lt;&lt; <span class="number">1</span>].setMvField( miAboveLeft.mv[<span class="number">0</span>], miAboveLeft.refIdx[<span class="number">0</span>] );</span><br><span class="line"></span><br><span class="line">        <span class="keyword">if</span>( slice.isInterB() )</span><br><span class="line">        &#123;</span><br><span class="line">          mrgCtx.mvFieldNeighbours[( cnt &lt;&lt; <span class="number">1</span> ) + <span class="number">1</span>].setMvField( miAboveLeft.mv[<span class="number">1</span>], miAboveLeft.refIdx[<span class="number">1</span>] );</span><br><span class="line">        &#125;</span><br><span class="line"></span><br><span class="line">        <span class="keyword">if</span> (mrgCandIdx == cnt)</span><br><span class="line">        &#123;</span><br><span class="line">          <span class="keyword">return</span>;</span><br><span class="line">        &#125;</span><br><span class="line"></span><br><span class="line">        cnt++;</span><br><span class="line">      &#125;</span><br><span class="line">    &#125;</span><br><span class="line">  &#125;</span><br><span class="line">  <span class="comment">// early termination</span></span><br><span class="line">  <span class="keyword">if</span> (cnt == maxNumMergeCand)</span><br><span class="line">  &#123;</span><br><span class="line">    <span class="keyword">return</span>;</span><br><span class="line">  &#125;</span><br><span class="line"></span><br><span class="line">  <span class="keyword">if</span> (slice.getPicHeader()-&gt;getEnableTMVPFlag() &amp;&amp; (pu.lumaSize().width + pu.lumaSize().height &gt; <span class="number">12</span>))</span><br><span class="line">  &#123;</span><br><span class="line">    <span class="comment">//&gt;&gt; MTK colocated-RightBottom</span></span><br><span class="line">    <span class="comment">// offset the pos to be sure to "point" to the same position the uiAbsPartIdx would've pointed to</span></span><br><span class="line">    Position posRB = pu.Y().bottomRight().offset( <span class="number">-3</span>, <span class="number">-3</span> );</span><br><span class="line">    <span class="keyword">const</span> PreCalcValues&amp; pcv = *cs.pcv;</span><br><span class="line"></span><br><span class="line">    Position posC0;</span><br><span class="line">    Position posC1 = pu.Y().center();</span><br><span class="line">    <span class="keyword">bool</span> C0Avail = <span class="literal">false</span>;</span><br><span class="line"><span class="meta">#<span class="meta-keyword">if</span> JVET_O1143_MV_ACROSS_SUBPIC_BOUNDARY</span></span><br><span class="line">    <span class="keyword">bool</span> boundaryCond = ((posRB.x + pcv.minCUWidth) &lt; pcv.lumaWidth) &amp;&amp; ((posRB.y + pcv.minCUHeight) &lt; pcv.lumaHeight);</span><br><span class="line">    SubPic curSubPic = pu.cs-&gt;slice-&gt;getPPS()-&gt;getSubPicFromPos(pu.lumaPos());</span><br><span class="line">    <span class="keyword">if</span> (curSubPic.getTreatedAsPicFlag())</span><br><span class="line">    &#123;</span><br><span class="line">      boundaryCond = ((posRB.x + pcv.minCUWidth) &lt;= curSubPic.getSubPicRight() &amp;&amp;</span><br><span class="line">                      (posRB.y + pcv.minCUHeight) &lt;= curSubPic.getSubPicBottom());</span><br><span class="line">    &#125;    </span><br><span class="line">    <span class="keyword">if</span> (boundaryCond)</span><br><span class="line"><span class="meta">#<span class="meta-keyword">else</span></span></span><br><span class="line">    <span class="keyword">if</span> (((posRB.x + pcv.minCUWidth) &lt; pcv.lumaWidth) &amp;&amp; ((posRB.y + pcv.minCUHeight) &lt; pcv.lumaHeight))</span><br><span class="line"><span class="meta">#<span class="meta-keyword">endif</span></span></span><br><span class="line">    &#123;</span><br><span class="line">      <span class="keyword">int</span> posYInCtu = posRB.y &amp; pcv.maxCUHeightMask;</span><br><span class="line">      <span class="keyword">if</span> (posYInCtu + <span class="number">4</span> &lt; pcv.maxCUHeight)</span><br><span class="line">      &#123;</span><br><span class="line">        posC0 = posRB.offset(<span class="number">4</span>, <span class="number">4</span>);</span><br><span class="line">        C0Avail = <span class="literal">true</span>;</span><br><span class="line">      &#125;</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    Mv        cColMv;</span><br><span class="line">    <span class="keyword">int</span>       iRefIdx     = <span class="number">0</span>;</span><br><span class="line">    <span class="keyword">int</span>       dir         = <span class="number">0</span>;</span><br><span class="line">    <span class="keyword">unsigned</span>  uiArrayAddr = cnt;</span><br><span class="line">    <span class="keyword">bool</span>      bExistMV    = ( C0Avail &amp;&amp; getColocatedMVP(pu, REF_PIC_LIST_0, posC0, cColMv, iRefIdx, <span class="literal">false</span> ) )</span><br><span class="line">                              || getColocatedMVP( pu, REF_PIC_LIST_0, posC1, cColMv, iRefIdx, <span class="literal">false</span> );</span><br><span class="line">    <span class="keyword">if</span> (bExistMV)</span><br><span class="line">    &#123;</span><br><span class="line">      dir     |= <span class="number">1</span>;</span><br><span class="line">      mrgCtx.mvFieldNeighbours[<span class="number">2</span> * uiArrayAddr].setMvField(cColMv, iRefIdx);</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    <span class="keyword">if</span> (slice.isInterB())</span><br><span class="line">    &#123;</span><br><span class="line">      bExistMV = ( C0Avail &amp;&amp; getColocatedMVP(pu, REF_PIC_LIST_1, posC0, cColMv, iRefIdx, <span class="literal">false</span> ) )</span><br><span class="line">                   || getColocatedMVP( pu, REF_PIC_LIST_1, posC1, cColMv, iRefIdx, <span class="literal">false</span> );</span><br><span class="line">      <span class="keyword">if</span> (bExistMV)</span><br><span class="line">      &#123;</span><br><span class="line">        dir     |= <span class="number">2</span>;</span><br><span class="line">        mrgCtx.mvFieldNeighbours[<span class="number">2</span> * uiArrayAddr + <span class="number">1</span>].setMvField(cColMv, iRefIdx);</span><br><span class="line">      &#125;</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    <span class="keyword">if</span>( dir != <span class="number">0</span> )</span><br><span class="line">    &#123;</span><br><span class="line">      <span class="keyword">bool</span> addTMvp = <span class="literal">true</span>;</span><br><span class="line">      <span class="keyword">if</span>( addTMvp )</span><br><span class="line">      &#123;</span><br><span class="line">        mrgCtx.interDirNeighbours[uiArrayAddr] = dir;</span><br><span class="line">        mrgCtx.BcwIdx[uiArrayAddr] = BCW_DEFAULT;</span><br><span class="line">        mrgCtx.useAltHpelIf[uiArrayAddr] = <span class="literal">false</span>;</span><br><span class="line">        <span class="keyword">if</span> (mrgCandIdx == cnt)</span><br><span class="line">        &#123;</span><br><span class="line">          <span class="keyword">return</span>;</span><br><span class="line">        &#125;</span><br><span class="line"></span><br><span class="line">        cnt++;</span><br><span class="line">      &#125;</span><br><span class="line">    &#125;</span><br><span class="line">  &#125;</span><br><span class="line"></span><br><span class="line">  <span class="comment">// early termination</span></span><br><span class="line">  <span class="keyword">if</span> (cnt == maxNumMergeCand)</span><br><span class="line">  &#123;</span><br><span class="line">    <span class="keyword">return</span>;</span><br><span class="line">  &#125;</span><br><span class="line"></span><br><span class="line">  <span class="keyword">int</span> maxNumMergeCandMin1 = maxNumMergeCand - <span class="number">1</span>;</span><br><span class="line">  <span class="keyword">if</span> (cnt != maxNumMergeCandMin1)</span><br><span class="line">  &#123;</span><br><span class="line">    <span class="keyword">bool</span> isGt4x4 = <span class="literal">true</span>;</span><br><span class="line">    <span class="keyword">bool</span> bFound = addMergeHMVPCand(cs, mrgCtx, mrgCandIdx, maxNumMergeCandMin1, cnt</span><br><span class="line">      , isAvailableA1, miLeft, isAvailableB1, miAbove</span><br><span class="line">      , CU::isIBC(*pu.cu)</span><br><span class="line">      , isGt4x4</span><br><span class="line">      );</span><br><span class="line"></span><br><span class="line">    <span class="keyword">if</span> (bFound)</span><br><span class="line">    &#123;</span><br><span class="line">      <span class="keyword">return</span>;</span><br><span class="line">    &#125;</span><br><span class="line">  &#125;</span><br><span class="line"></span><br><span class="line">  <span class="comment">// pairwise-average candidates   对merge list前4个候选MV按照顺序进行逐对平均</span></span><br><span class="line">  &#123;</span><br><span class="line"></span><br><span class="line">    <span class="keyword">if</span> (cnt &gt; <span class="number">1</span> &amp;&amp; cnt &lt; maxNumMergeCand)</span><br><span class="line">    &#123;</span><br><span class="line"></span><br><span class="line">      mrgCtx.mvFieldNeighbours[cnt * <span class="number">2</span>].setMvField( Mv( <span class="number">0</span>, <span class="number">0</span> ), NOT_VALID );</span><br><span class="line">      mrgCtx.mvFieldNeighbours[cnt * <span class="number">2</span> + <span class="number">1</span>].setMvField( Mv( <span class="number">0</span>, <span class="number">0</span> ), NOT_VALID );</span><br><span class="line">      <span class="comment">// calculate average MV for L0 and L1 seperately</span></span><br><span class="line">      <span class="keyword">unsigned</span> <span class="keyword">char</span> interDir = <span class="number">0</span>;</span><br><span class="line"></span><br><span class="line"></span><br><span class="line">      mrgCtx.useAltHpelIf[cnt] = (mrgCtx.useAltHpelIf[<span class="number">0</span>] == mrgCtx.useAltHpelIf[<span class="number">1</span>]) ? mrgCtx.useAltHpelIf[<span class="number">0</span>] : <span class="literal">false</span>;</span><br><span class="line">      <span class="keyword">for</span>( <span class="keyword">int</span> refListId = <span class="number">0</span>; refListId &lt; (slice.isInterB() ? <span class="number">2</span> : <span class="number">1</span>); refListId++ )</span><br><span class="line">      &#123;</span><br><span class="line">        <span class="keyword">const</span> short refIdxI = mrgCtx.mvFieldNeighbours[<span class="number">0</span> * <span class="number">2</span> + refListId].refIdx;</span><br><span class="line">        <span class="keyword">const</span> short refIdxJ = mrgCtx.mvFieldNeighbours[<span class="number">1</span> * <span class="number">2</span> + refListId].refIdx;</span><br><span class="line"></span><br><span class="line">        <span class="comment">// both MVs are invalid, skip</span></span><br><span class="line">        <span class="keyword">if</span>( (refIdxI == NOT_VALID) &amp;&amp; (refIdxJ == NOT_VALID) )</span><br><span class="line">        &#123;</span><br><span class="line">          <span class="keyword">continue</span>;</span><br><span class="line">        &#125;</span><br><span class="line"></span><br><span class="line">        interDir += <span class="number">1</span> &lt;&lt; refListId;</span><br><span class="line">        <span class="comment">// both MVs are valid, average these two MVs</span></span><br><span class="line">        <span class="keyword">if</span>( (refIdxI != NOT_VALID) &amp;&amp; (refIdxJ != NOT_VALID) )</span><br><span class="line">        &#123;</span><br><span class="line">          <span class="keyword">const</span> Mv&amp; MvI = mrgCtx.mvFieldNeighbours[<span class="number">0</span> * <span class="number">2</span> + refListId].mv;</span><br><span class="line">          <span class="keyword">const</span> Mv&amp; MvJ = mrgCtx.mvFieldNeighbours[<span class="number">1</span> * <span class="number">2</span> + refListId].mv;</span><br><span class="line"></span><br><span class="line">          <span class="comment">// average two MVs</span></span><br><span class="line">          Mv avgMv = MvI;</span><br><span class="line">          avgMv += MvJ;</span><br><span class="line">          roundAffineMv(avgMv.hor, avgMv.ver, <span class="number">1</span>);</span><br><span class="line"></span><br><span class="line">          mrgCtx.mvFieldNeighbours[cnt * <span class="number">2</span> + refListId].setMvField( avgMv, refIdxI );</span><br><span class="line">        &#125;</span><br><span class="line">        <span class="comment">// only one MV is valid, take the only one MV</span></span><br><span class="line">        <span class="keyword">else</span> <span class="keyword">if</span>( refIdxI != NOT_VALID )</span><br><span class="line">        &#123;</span><br><span class="line">          Mv singleMv = mrgCtx.mvFieldNeighbours[<span class="number">0</span> * <span class="number">2</span> + refListId].mv;</span><br><span class="line">          mrgCtx.mvFieldNeighbours[cnt * <span class="number">2</span> + refListId].setMvField( singleMv, refIdxI );</span><br><span class="line">        &#125;</span><br><span class="line">        <span class="keyword">else</span> <span class="keyword">if</span>( refIdxJ != NOT_VALID )</span><br><span class="line">        &#123;</span><br><span class="line">          Mv singleMv = mrgCtx.mvFieldNeighbours[<span class="number">1</span> * <span class="number">2</span> + refListId].mv;</span><br><span class="line">          mrgCtx.mvFieldNeighbours[cnt * <span class="number">2</span> + refListId].setMvField( singleMv, refIdxJ );</span><br><span class="line">        &#125;</span><br><span class="line">      &#125;</span><br><span class="line"></span><br><span class="line">      mrgCtx.interDirNeighbours[cnt] = interDir;</span><br><span class="line">      <span class="keyword">if</span>( interDir &gt; <span class="number">0</span> )</span><br><span class="line">      &#123;</span><br><span class="line">        cnt++;</span><br><span class="line">      &#125;</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    <span class="comment">// early termination</span></span><br><span class="line">    <span class="keyword">if</span>( cnt == maxNumMergeCand )</span><br><span class="line">    &#123;</span><br><span class="line">      <span class="keyword">return</span>;</span><br><span class="line">    &#125;</span><br><span class="line">  &#125;</span><br><span class="line"></span><br><span class="line">  <span class="keyword">uint32_t</span> uiArrayAddr = cnt;</span><br><span class="line"></span><br><span class="line">  <span class="keyword">int</span> iNumRefIdx = slice.isInterB() ? <span class="built_in">std</span>::min(slice.getNumRefIdx(REF_PIC_LIST_0), slice.getNumRefIdx(REF_PIC_LIST_1)) : slice.getNumRefIdx(REF_PIC_LIST_0);</span><br><span class="line"></span><br><span class="line">  <span class="keyword">int</span> r = <span class="number">0</span>;</span><br><span class="line">  <span class="keyword">int</span> refcnt = <span class="number">0</span>;</span><br><span class="line">  <span class="keyword">while</span> (uiArrayAddr &lt; maxNumMergeCand)</span><br><span class="line">  &#123;</span><br><span class="line">    mrgCtx.interDirNeighbours [uiArrayAddr     ] = <span class="number">1</span>;</span><br><span class="line">    mrgCtx.BcwIdx             [uiArrayAddr     ] = BCW_DEFAULT;</span><br><span class="line">    mrgCtx.mvFieldNeighbours  [uiArrayAddr &lt;&lt; <span class="number">1</span>].setMvField(Mv(<span class="number">0</span>, <span class="number">0</span>), r);</span><br><span class="line">    mrgCtx.useAltHpelIf[uiArrayAddr] = <span class="literal">false</span>;</span><br><span class="line"></span><br><span class="line">    <span class="keyword">if</span> (slice.isInterB())</span><br><span class="line">    &#123;</span><br><span class="line">      mrgCtx.interDirNeighbours [ uiArrayAddr          ] = <span class="number">3</span>;</span><br><span class="line">      mrgCtx.mvFieldNeighbours  [(uiArrayAddr &lt;&lt; <span class="number">1</span>) + <span class="number">1</span>].setMvField(Mv(<span class="number">0</span>, <span class="number">0</span>), r);</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    <span class="keyword">if</span> ( mrgCtx.interDirNeighbours[uiArrayAddr] == <span class="number">1</span> &amp;&amp; pu.cs-&gt;slice-&gt;getRefPic(REF_PIC_LIST_0, mrgCtx.mvFieldNeighbours[uiArrayAddr &lt;&lt; <span class="number">1</span>].refIdx)-&gt;getPOC() == pu.cs-&gt;slice-&gt;getPOC())</span><br><span class="line">    &#123;</span><br><span class="line">      mrgCtx.mrgTypeNeighbours[uiArrayAddr] = MRG_TYPE_IBC;</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    uiArrayAddr++;</span><br><span class="line"></span><br><span class="line">    <span class="keyword">if</span> (refcnt == iNumRefIdx - <span class="number">1</span>)</span><br><span class="line">    &#123;</span><br><span class="line">      r = <span class="number">0</span>;</span><br><span class="line">    &#125;</span><br><span class="line">    <span class="keyword">else</span></span><br><span class="line">    &#123;</span><br><span class="line">      ++r;</span><br><span class="line">      ++refcnt;</span><br><span class="line">    &#125;</span><br><span class="line">  &#125;</span><br><span class="line">  mrgCtx.numValidMergeCand = uiArrayAddr;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+
+
+<p>【参考文献】</p>
+<ul>
+<li><p>JVET-N1002</p>
+</li>
+<li><p>JVET-L0266</p>
+</li>
+<li><p>JVET-L0090</p>
+</li>
+</ul>
+
+      
+
+      
+        <div class="page-reward">
+          <a href="javascript:;" class="page-reward-btn tooltip-top">
+            <div class="tooltip tooltip-east">
+            <span class="tooltip-item">
+              赏
+            </span>
+            <span class="tooltip-content">
+              <span class="tooltip-text">
+                <span class="tooltip-inner">
+                  <p class="reward-p"><i class="icon icon-quo-left"></i>谢谢你请我吃糖果<i class="icon icon-quo-right"></i></p>
+                  <div class="reward-box">
+                    
+                    <div class="reward-box-item">
+                      <img class="reward-img" src="/assets/支付宝.png">
+                      <span class="reward-type">支付宝</span>
+                    </div>
+                    
+                    
+                    <div class="reward-box-item">
+                      <img class="reward-img" src="/assets/微信收款.png">
+                      <span class="reward-type">微信</span>
+                    </div>
+                    
+                  </div>
+                </span>
+              </span>
+            </span>
+          </div>
+          </a>
+        </div>
+      
+    </div>
+    <div class="article-info article-info-index">
+      
+      
 	<div class="article-tag tagcloud">
 		<i class="icon-price-tags icon"></i>
 		<ul class="article-tag-list">
@@ -216,58 +314,135 @@
 		</ul>
 	</div>
 
-          
+      
 
+      
+
+      
+        
+<div class="share-btn share-icons tooltip-left">
+  <div class="tooltip tooltip-east">
+    <span class="tooltip-item">
+      <a href="javascript:;" class="share-sns share-outer">
+        <i class="icon icon-share"></i>
+      </a>
+    </span>
+    <span class="tooltip-content">
+      <div class="share-wrap">
+        <div class="share-icons">
+          <a class="weibo share-sns" href="javascript:;" data-type="weibo">
+            <i class="icon icon-weibo"></i>
+          </a>
+          <a class="weixin share-sns wxFab" href="javascript:;" data-type="weixin">
+            <i class="icon icon-weixin"></i>
+          </a>
+          <a class="qq share-sns" href="javascript:;" data-type="qq">
+            <i class="icon icon-qq"></i>
+          </a>
+          <a class="douban share-sns" href="javascript:;" data-type="douban">
+            <i class="icon icon-douban"></i>
+          </a>
+          <a class="qzone share-sns" href="javascript:;" data-type="qzone">
+            <i class="icon icon-qzone"></i>
+          </a>
+          <a class="facebook share-sns" href="javascript:;" data-type="facebook">
+            <i class="icon icon-facebook"></i>
+          </a>
+          <a class="twitter share-sns" href="javascript:;" data-type="twitter">
+            <i class="icon icon-twitter"></i>
+          </a>
+          <a class="google share-sns" href="javascript:;" data-type="google">
+            <i class="icon icon-google"></i>
+          </a>
         </div>
-        <div class="clearfix"></div>
-    </header>
+      </div>
+    </span>
+  </div>
+</div>
+
+<div class="page-modal wx-share js-wx-box">
+    <a class="close js-modal-close" href="javascript:;"><i class="icon icon-close"></i></a>
+    <p>扫一扫，分享到微信</p>
+    <div class="wx-qrcode">
+      <img src="//api.qrserver.com/v1/create-qr-code/?size=150x150&data=http://jiabo-cohen.github.io/2020/06/29/VVC%E5%B8%A7%E9%97%B4%E9%A2%84%E6%B5%8B%E4%B8%AD%E6%89%A9%E5%B1%95merge%E6%A8%A1%E5%BC%8F/" alt="微信分享二维码">
+    </div>
+</div>
+
+<div class="mask js-mask"></div>
+      
+      <div class="clearfix"></div>
+    </div>
   </div>
 </article>
+
   
-    
-    
-    <article class="archive-article archive-type-post">
-  <div class="archive-article-inner">
-    <header class="archive-article-header">
-      	<div class="article-meta">
-	      	
-<a href="/2020/06/28/VVC%E5%B8%A7%E9%97%B4%E9%A2%84%E6%B5%8B%E4%B8%8EHEVC%E5%B8%A7%E9%97%B4%E6%8A%80%E6%9C%AF%E5%90%8E%E7%9A%84%E6%94%B9%E8%BF%9B/" class="archive-article-date">
-  	<time datetime="2020-06-28T03:13:39.000Z" itemprop="datePublished"><i class="icon-calendar icon"></i>2020-06-28</time>
-</a>
+<nav id="article-nav">
+  
+  
+    <a href="/2020/06/28/VVC%E5%B8%A7%E9%97%B4%E9%A2%84%E6%B5%8B%E4%B8%8EHEVC%E5%B8%A7%E9%97%B4%E6%8A%80%E6%9C%AF%E5%90%8E%E7%9A%84%E6%94%B9%E8%BF%9B/" id="article-nav-older" class="article-nav-link-wrap">
+      <div class="article-nav-title">VVC帧间预测与HEVC帧间技术的改进</div>
+      <i class="icon-circle-right"></i>
+    </a>
+  
+</nav>
+
+
+<aside class="wrap-side-operation">
+    <div class="mod-side-operation">
+        
+        <div class="jump-container" id="js-jump-container" style="display:none;">
+            <a href="javascript:void(0)" class="mod-side-operation__jump-to-top">
+                <i class="icon-font icon-back"></i>
+            </a>
+            <div id="js-jump-plan-container" class="jump-plan-container" style="top: -11px;">
+                <i class="icon-font icon-plane jump-plane"></i>
+            </div>
         </div>
-    	 
-  
-    <h1 itemprop="name">
-      <a class="archive-article-title" href="/2020/06/28/VVC%E5%B8%A7%E9%97%B4%E9%A2%84%E6%B5%8B%E4%B8%8EHEVC%E5%B8%A7%E9%97%B4%E6%8A%80%E6%9C%AF%E5%90%8E%E7%9A%84%E6%94%B9%E8%BF%9B/">VVC帧间预测与HEVC帧间技术的改进</a>
-    </h1>
-  
-
-        <div class="article-info info-on-right">
-          
-	<div class="article-tag tagcloud">
-		<i class="icon-price-tags icon"></i>
-		<ul class="article-tag-list">
-			 
-        		<li class="article-tag-list-item">
-        			<a href="javascript:void(0)" class="js-tag article-tag-list-link color5">视频编码</a>
-        		</li>
-      		
-		</ul>
-	</div>
-
-          
-
+        
+        
+        <div class="toc-container tooltip-left">
+            <i class="icon-font icon-category"></i>
+            <div class="tooltip tooltip-east">
+                <span class="tooltip-item">
+                </span>
+                <span class="tooltip-content">
+                    <div class="toc-article">
+                    <ol class="toc"><li class="toc-item toc-level-2"><a class="toc-link" href="#扩展的Mrege模式"><span class="toc-number">1.</span> <span class="toc-text">扩展的Mrege模式</span></a><ol class="toc-child"><li class="toc-item toc-level-3"><a class="toc-link" href="#一、空域候选列表构建"><span class="toc-number">1.1.</span> <span class="toc-text">一、空域候选列表构建</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#二、时域候选列表的构建"><span class="toc-number">1.2.</span> <span class="toc-text">二、时域候选列表的构建</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#三、基于历史信息构建MVP-HMVP"><span class="toc-number">1.3.</span> <span class="toc-text">三、基于历史信息构建MVP(HMVP)</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#四、逐对的平均MVP"><span class="toc-number">1.4.</span> <span class="toc-text">四、逐对的平均MVP</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#五、零向量"><span class="toc-number">1.5.</span> <span class="toc-text">五、零向量</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#六、总结"><span class="toc-number">1.6.</span> <span class="toc-text">六、总结</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#七、代码分析"><span class="toc-number">1.7.</span> <span class="toc-text">七、代码分析</span></a></li></ol></li></ol>
+                    </div>
+                </span>
+            </div>
         </div>
-        <div class="clearfix"></div>
-    </header>
-  </div>
-</article>
+        
+    </div>
+</aside>
+
+
+
   
   
-    </div></section>
   
 
-    
+  
+
+  
+
+  
+  <div id="gitment-ctn"></div> 
+<link rel="stylesheet" href="//imsun.github.io/gitment/style/default.css">
+<script src="//imsun.github.io/gitment/dist/gitment.browser.js"></script>
+<script>
+var gitment = new Gitment({
+  id: "http://yoursite.com/2020/06/29/VVC%E5%B8%A7%E9%97%B4%E9%A2%84%E6%B5%8B%E4%B8%AD%E6%89%A9%E5%B1%95merge%E6%A8%A1%E5%BC%8F/",
+  owner: 'jiabo-Cohen',
+  repo: 'jiabo-Cohen.github.io ',
+  oauth: {
+    client_id: '41f100df0577df00f359',
+    client_secret: '52325cac463b7af10537ebdfa26df4a64c843de5',
+  },
+})
+gitment.render('gitment-ctn')
+</script>
+  
 
 
           </div>
@@ -305,9 +480,9 @@
 	var yiliaConfig = {
 		mathjax: true,
 		isHome: false,
-		isPost: false,
+		isPost: true,
 		isArchive: false,
-		isTag: true,
+		isTag: false,
 		isCategory: false,
 		open_in_new: false,
 		toc_hide_index: true,
