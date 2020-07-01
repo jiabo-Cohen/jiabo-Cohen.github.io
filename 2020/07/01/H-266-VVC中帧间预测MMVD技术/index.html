@@ -6,15 +6,24 @@
   <meta name="renderer" content="webkit">
   <meta http-equiv="X-UA-Compatible" content="IE=edge" >
   <link rel="dns-prefetch" href="http://yoursite.com">
-  <title>Tag: 视频编码 | Cohen学长的博客</title>
+  <title>H.266/VVC中帧间预测MMVD技术 | Cohen学长的博客</title>
   <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
-  <meta property="og:type" content="website">
-<meta property="og:title" content="Cohen学长的博客">
-<meta property="og:url" content="http://yoursite.com/tags/%E8%A7%86%E9%A2%91%E7%BC%96%E7%A0%81/index.html">
+  <meta property="og:type" content="article">
+<meta property="og:title" content="H.266&#x2F;VVC中帧间预测MMVD技术">
+<meta property="og:url" content="http://yoursite.com/2020/07/01/H-266-VVC%E4%B8%AD%E5%B8%A7%E9%97%B4%E9%A2%84%E6%B5%8BMMVD%E6%8A%80%E6%9C%AF/index.html">
 <meta property="og:site_name" content="Cohen学长的博客">
 <meta property="og:locale" content="en_US">
+<meta property="og:image" content="https://raw.githubusercontent.com/jiabo-Cohen/Images/master/20200701113255.jpg">
+<meta property="og:image" content="https://raw.githubusercontent.com/jiabo-Cohen/Images/master/20200630145422.png">
+<meta property="og:image" content="https://raw.githubusercontent.com/jiabo-Cohen/Images/master/20200630152349.png">
+<meta property="og:image" content="https://raw.githubusercontent.com/jiabo-Cohen/Images/master/20200630152548.png">
+<meta property="og:image" content="https://raw.githubusercontent.com/jiabo-Cohen/Images/master/20200630152552.png">
+<meta property="article:published_time" content="2020-07-01T03:36:50.000Z">
+<meta property="article:modified_time" content="2020-07-01T03:38:49.069Z">
 <meta property="article:author" content="Cohen 学长">
+<meta property="article:tag" content="视频编码">
 <meta name="twitter:card" content="summary">
+<meta name="twitter:image" content="https://raw.githubusercontent.com/jiabo-Cohen/Images/master/20200701113255.jpg">
   
     <link rel="alternative" href="/atom.xml" title="Cohen学长的博客" type="application/atom+xml">
   
@@ -175,36 +184,103 @@
           </div>
           <div id="js-content" class="content-ll">
             
+<article id="post-H-266-VVC中帧间预测MMVD技术" class="article article-type-post " itemscope itemprop="blogPost">
+  <div class="article-inner">
+    
+      <header class="article-header">
+        
   
+    <h1 class="article-title" itemprop="name">
+      H.266/VVC中帧间预测MMVD技术
+    </h1>
   
-    
-    
-      
-      
-      <section class="archives-wrap">
-        <div class="archive-year-wrap">
-          <a href="/archives/2020" class="archive-year">2020</a>
-        </div>
-        <div class="archives">
-    
-    <article class="archive-article archive-type-post">
-  <div class="archive-article-inner">
-    <header class="archive-article-header">
-      	<div class="article-meta">
-	      	
+
+        
+        
+	<!-- 不蒜子统计 -->
+	<span id="busuanzi_container_page_pv" style='display:none' class="archive-article-date">
+		  <i class="icon-smile icon"></i> 阅读数：<span id="busuanzi_value_page_pv"></span>次
+	</span>
+
 <a href="/2020/07/01/H-266-VVC%E4%B8%AD%E5%B8%A7%E9%97%B4%E9%A2%84%E6%B5%8BMMVD%E6%8A%80%E6%9C%AF/" class="archive-article-date">
   	<time datetime="2020-07-01T03:36:50.000Z" itemprop="datePublished"><i class="icon-calendar icon"></i>2020-07-01</time>
 </a>
-        </div>
-    	 
-  
-    <h1 itemprop="name">
-      <a class="archive-article-title" href="/2020/07/01/H-266-VVC%E4%B8%AD%E5%B8%A7%E9%97%B4%E9%A2%84%E6%B5%8BMMVD%E6%8A%80%E6%9C%AF/">H.266/VVC中帧间预测MMVD技术</a>
-    </h1>
-  
+        
+      </header>
+    
+    <div class="article-entry" itemprop="articleBody">
+      
+        <div align=center><img width="650" height="400" src="https://raw.githubusercontent.com/jiabo-Cohen/Images/master/20200701113255.jpg"></div>
+<a id="more"></a>
 
-        <div class="article-info info-on-right">
-          
+<h3 id="一、前言"><a href="#一、前言" class="headerlink" title="一、前言"></a>一、前言</h3><p>在VVC的扩展merge模式当中，当前CU生成的merge list中选择一个率失真代价值最小的候选项直接作为自己的运动信息，而MMVD是将候选项的运动信息作为自己MV的预测值，最终编码对象为实际获得的MV与该预测值之间的差值(MVD)</p>
+<p>MMVD技术起源于之前提案中的ultimate motion vector expression（UMVE）技术，该技术是一种新的运动向量表示方法，在skip和merge模式当中使用起始点、运动步长、运动方向三个量来表示运动向量</p>
+<p>MMVD技术应用与帧间预测的Skip和Merge模式当中，是一种运动矢量的特殊表达形式，在VTM中，MMVD技术流程大致如下所示：</p>
+<ul>
+<li>首先复用普通merge模式的merge候选列表，在这些候选中选择列表的前两个候选作为初始的运动矢量</li>
+<li>对该初始MV进行扩展，主要在运动幅度和运动方向上进行扩展，来得到最终的扩展后的运动矢量，以形成新的运动矢量。</li>
+</ul>
+<h3 id="二、具体实现步骤"><a href="#二、具体实现步骤" class="headerlink" title="二、具体实现步骤"></a>二、具体实现步骤</h3><p>具体实现步骤如下：</p>
+<p>(1)首先利用VVC中普通merge候选列表构建的过程，得到当前CU的merge list，检查邻块的顺序如下图所示</p>
+<div align=center><img width="593" height="86" src="https://raw.githubusercontent.com/jiabo-Cohen/Images/master/20200630145422.png" /></div>
+(2)、对于第一步得到的merge list中的前两个候选，把它们作为初始的MV，以该候选MV在参考图像中所指向的位置作为起始点，在上下左右四个方向上，进行8中步长的搜索，如下图所示
+
+<div align=center><img width="494" height="305" src="https://raw.githubusercontent.com/jiabo-Cohen/Images/master/20200630152349.png" /></div>
+步长索引表：
+
+<div align=center><img width="594" height="127" src="https://raw.githubusercontent.com/jiabo-Cohen/Images/master/20200630152548.png" /></div>
+方向索引表：
+
+<div align=center><img width="586" height="149" src="https://raw.githubusercontent.com/jiabo-Cohen/Images/master/20200630152552.png" /></div>
+这样每一个初始MV在每个方向上的每种步长都会形成一个新的MV，即细化过的MV，该MV包含三个信息，分别是起始点、搜索方向、搜索步长，因此一个初始的MV可以扩展出32个新的MV，这些新的MV也会通过一次运动补偿得到当前CU的预测值。
+
+<p>(3)、在Skip和merge模式下，将所有得到的64个新的预测值之间进行率失真代价比较，最终选择出最优的一种组合作为MMVD的最优的merge候选，我们需要存储该MV的三个信息：分别是其初始MV在merge list中的索引值、移动的方向和搜索步长三个语法元素</p>
+<h3 id="三、相关代码的详细分析（VTM8-0）"><a href="#三、相关代码的详细分析（VTM8-0）" class="headerlink" title="三、相关代码的详细分析（VTM8.0）"></a>三、相关代码的详细分析（VTM8.0）</h3><p>1.在merge list中选择前两个运动向量作为MMVD的初始向量代码示例</p>
+<figure class="highlight cpp"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">static</span> <span class="keyword">const</span> <span class="keyword">int</span> MMVD_BASE_MV_NUM = <span class="number">2</span>;    <span class="comment">//一个全局静态常量，基于MMVD初始向量的个数</span></span><br><span class="line"><span class="comment">//从merge list当中选取两个初始MV</span></span><br><span class="line"><span class="function"><span class="keyword">void</span> <span class="title">PU::getInterMMVDMergeCandidates</span><span class="params">(<span class="keyword">const</span> PredictionUnit &amp;pu, MergeCtx&amp; mrgCtx, <span class="keyword">const</span> <span class="keyword">int</span>&amp; mrgCandIdx)</span></span></span><br><span class="line"><span class="function"></span>&#123;</span><br><span class="line">  <span class="keyword">int</span> refIdxList0, refIdxList1;</span><br><span class="line">  <span class="keyword">int</span> k;</span><br><span class="line">  <span class="keyword">int</span> currBaseNum = <span class="number">0</span>;</span><br><span class="line">  <span class="keyword">const</span> <span class="keyword">uint16_t</span> maxNumMergeCand = mrgCtx.numValidMergeCand;</span><br><span class="line"></span><br><span class="line">  <span class="keyword">for</span> (k = <span class="number">0</span>; k &lt; maxNumMergeCand; k++)</span><br><span class="line">  &#123;</span><br><span class="line">    <span class="comment">//只取MRG_TYPE_DEFAULT_N类型候选项</span></span><br><span class="line">    <span class="keyword">if</span> (mrgCtx.mrgTypeNeighbours[k] == MRG_TYPE_DEFAULT_N)</span><br><span class="line">    &#123;</span><br><span class="line">      refIdxList0 = mrgCtx.mvFieldNeighbours[(k &lt;&lt; <span class="number">1</span>)].refIdx;</span><br><span class="line">      refIdxList1 = mrgCtx.mvFieldNeighbours[(k &lt;&lt; <span class="number">1</span>) + <span class="number">1</span>].refIdx;</span><br><span class="line"></span><br><span class="line">      <span class="keyword">if</span> ((refIdxList0 &gt;= <span class="number">0</span>) &amp;&amp; (refIdxList1 &gt;= <span class="number">0</span>))</span><br><span class="line">      &#123;</span><br><span class="line">        mrgCtx.mmvdBaseMv[currBaseNum][<span class="number">0</span>] = mrgCtx.mvFieldNeighbours[(k &lt;&lt; <span class="number">1</span>)];</span><br><span class="line">        mrgCtx.mmvdBaseMv[currBaseNum][<span class="number">1</span>] = mrgCtx.mvFieldNeighbours[(k &lt;&lt; <span class="number">1</span>) + <span class="number">1</span>];</span><br><span class="line">      &#125;</span><br><span class="line">      <span class="keyword">else</span> <span class="keyword">if</span> (refIdxList0 &gt;= <span class="number">0</span>)</span><br><span class="line">      &#123;</span><br><span class="line">        mrgCtx.mmvdBaseMv[currBaseNum][<span class="number">0</span>] = mrgCtx.mvFieldNeighbours[(k &lt;&lt; <span class="number">1</span>)];</span><br><span class="line">        mrgCtx.mmvdBaseMv[currBaseNum][<span class="number">1</span>] = MvField(Mv(<span class="number">0</span>, <span class="number">0</span>), <span class="number">-1</span>);</span><br><span class="line">      &#125;</span><br><span class="line">      <span class="keyword">else</span> <span class="keyword">if</span> (refIdxList1 &gt;= <span class="number">0</span>)</span><br><span class="line">      &#123;</span><br><span class="line">        mrgCtx.mmvdBaseMv[currBaseNum][<span class="number">0</span>] = MvField(Mv(<span class="number">0</span>, <span class="number">0</span>), <span class="number">-1</span>);</span><br><span class="line">        mrgCtx.mmvdBaseMv[currBaseNum][<span class="number">1</span>] = mrgCtx.mvFieldNeighbours[(k &lt;&lt; <span class="number">1</span>) + <span class="number">1</span>];</span><br><span class="line">      &#125;</span><br><span class="line">      mrgCtx.mmvdUseAltHpelIf[currBaseNum] = mrgCtx.useAltHpelIf[k];</span><br><span class="line"></span><br><span class="line">      currBaseNum++;</span><br><span class="line">      <span class="comment">//只取两个base MV</span></span><br><span class="line">      <span class="keyword">if</span> (currBaseNum == MMVD_BASE_MV_NUM)</span><br><span class="line">        <span class="keyword">break</span>;</span><br><span class="line">    &#125;</span><br><span class="line">  &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<p>2.对选择的初始运动矢量进行步长和方向的扩展</p>
+<figure class="highlight cpp"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br><span class="line">48</span><br><span class="line">49</span><br><span class="line">50</span><br><span class="line">51</span><br><span class="line">52</span><br><span class="line">53</span><br><span class="line">54</span><br><span class="line">55</span><br><span class="line">56</span><br><span class="line">57</span><br><span class="line">58</span><br><span class="line">59</span><br><span class="line">60</span><br><span class="line">61</span><br><span class="line">62</span><br><span class="line">63</span><br><span class="line">64</span><br><span class="line">65</span><br><span class="line">66</span><br><span class="line">67</span><br><span class="line">68</span><br><span class="line">69</span><br><span class="line">70</span><br><span class="line">71</span><br><span class="line">72</span><br><span class="line">73</span><br><span class="line">74</span><br><span class="line">75</span><br><span class="line">76</span><br><span class="line">77</span><br><span class="line">78</span><br><span class="line">79</span><br><span class="line">80</span><br><span class="line">81</span><br><span class="line">82</span><br><span class="line">83</span><br><span class="line">84</span><br><span class="line">85</span><br><span class="line">86</span><br><span class="line">87</span><br><span class="line">88</span><br><span class="line">89</span><br><span class="line">90</span><br><span class="line">91</span><br><span class="line">92</span><br><span class="line">93</span><br><span class="line">94</span><br><span class="line">95</span><br><span class="line">96</span><br><span class="line">97</span><br><span class="line">98</span><br><span class="line">99</span><br><span class="line">100</span><br><span class="line">101</span><br><span class="line">102</span><br><span class="line">103</span><br><span class="line">104</span><br><span class="line">105</span><br><span class="line">106</span><br><span class="line">107</span><br><span class="line">108</span><br><span class="line">109</span><br><span class="line">110</span><br><span class="line">111</span><br><span class="line">112</span><br><span class="line">113</span><br><span class="line">114</span><br><span class="line">115</span><br><span class="line">116</span><br><span class="line">117</span><br><span class="line">118</span><br><span class="line">119</span><br><span class="line">120</span><br><span class="line">121</span><br><span class="line">122</span><br><span class="line">123</span><br><span class="line">124</span><br><span class="line">125</span><br><span class="line">126</span><br><span class="line">127</span><br><span class="line">128</span><br><span class="line">129</span><br><span class="line">130</span><br><span class="line">131</span><br><span class="line">132</span><br><span class="line">133</span><br><span class="line">134</span><br><span class="line">135</span><br><span class="line">136</span><br><span class="line">137</span><br><span class="line">138</span><br><span class="line">139</span><br><span class="line">140</span><br><span class="line">141</span><br><span class="line">142</span><br><span class="line">143</span><br><span class="line">144</span><br><span class="line">145</span><br><span class="line">146</span><br><span class="line">147</span><br><span class="line">148</span><br><span class="line">149</span><br><span class="line">150</span><br><span class="line">151</span><br><span class="line">152</span><br><span class="line">153</span><br><span class="line">154</span><br><span class="line">155</span><br><span class="line">156</span><br><span class="line">157</span><br><span class="line">158</span><br><span class="line">159</span><br><span class="line">160</span><br><span class="line">161</span><br><span class="line">162</span><br><span class="line">163</span><br><span class="line">164</span><br><span class="line">165</span><br><span class="line">166</span><br><span class="line">167</span><br><span class="line">168</span><br><span class="line">169</span><br><span class="line">170</span><br><span class="line">171</span><br><span class="line">172</span><br><span class="line">173</span><br><span class="line">174</span><br><span class="line">175</span><br><span class="line">176</span><br><span class="line">177</span><br><span class="line">178</span><br><span class="line">179</span><br><span class="line">180</span><br><span class="line">181</span><br><span class="line">182</span><br><span class="line">183</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">//设置MMVD的候选信息，candIdx就是32中组合中的一种模式的索引</span></span><br><span class="line"><span class="function"><span class="keyword">void</span> <span class="title">MergeCtx::setMmvdMergeCandiInfo</span><span class="params">(PredictionUnit&amp; pu, <span class="keyword">int</span> candIdx)</span></span></span><br><span class="line"><span class="function"></span>&#123;</span><br><span class="line">  <span class="keyword">const</span> Slice &amp;slice = *pu.cs-&gt;slice;</span><br><span class="line">  <span class="keyword">const</span> <span class="keyword">int</span> mvShift = MV_FRACTIONAL_BITS_DIFF;</span><br><span class="line">    </span><br><span class="line">  <span class="comment">//参考MVD的候选，2，8，16，32，64，128，256</span></span><br><span class="line">  <span class="comment">//这里实际就是8中补偿的偏置量</span></span><br><span class="line">  <span class="keyword">const</span> <span class="keyword">int</span> refMvdCands[<span class="number">8</span>] = &#123; <span class="number">1</span> &lt;&lt; mvShift , <span class="number">2</span> &lt;&lt; mvShift , <span class="number">4</span> &lt;&lt; mvShift , <span class="number">8</span> &lt;&lt; mvShift , <span class="number">16</span> &lt;&lt; mvShift , <span class="number">32</span> &lt;&lt; mvShift,  <span class="number">64</span> &lt;&lt; mvShift , <span class="number">128</span> &lt;&lt; mvShift &#125;;</span><br><span class="line">  <span class="keyword">int</span> fPosGroup = <span class="number">0</span>;</span><br><span class="line">  <span class="keyword">int</span> fPosBaseIdx = <span class="number">0</span>;   <span class="comment">//起始MV的索引</span></span><br><span class="line">  <span class="keyword">int</span> fPosStep = <span class="number">0</span>;  <span class="comment">//搜索步长</span></span><br><span class="line">  <span class="keyword">int</span> tempIdx = <span class="number">0</span>;</span><br><span class="line">  <span class="keyword">int</span> fPosPosition = <span class="number">0</span>;    <span class="comment">//搜索的方向</span></span><br><span class="line">  Mv tempMv[<span class="number">2</span>];    <span class="comment">//里面存储前向和后向MV</span></span><br><span class="line"></span><br><span class="line">  tempIdx = candIdx;   <span class="comment">//组合新的MV索引</span></span><br><span class="line">  fPosGroup = tempIdx / (MMVD_BASE_MV_NUM * MMVD_MAX_REFINE_NUM);  <span class="comment">//整个候选列表的初始位置为0</span></span><br><span class="line">  tempIdx = tempIdx - fPosGroup * (MMVD_BASE_MV_NUM * MMVD_MAX_REFINE_NUM);  <span class="comment">//传进来扩展MV的索引</span></span><br><span class="line">  fPosBaseIdx = tempIdx / MMVD_MAX_REFINE_NUM;<span class="comment">//第一个初始向量的索引0或者第二个初始向量的索引1</span></span><br><span class="line">  tempIdx = tempIdx - fPosBaseIdx * (MMVD_MAX_REFINE_NUM);<span class="comment">//0-31（各自初始向量的32中扩展MV）</span></span><br><span class="line">  fPosStep = tempIdx / <span class="number">4</span>;  <span class="comment">//每个初始MV对应对应的8种搜索步长的索引</span></span><br><span class="line">  fPosPosition = tempIdx - fPosStep * (<span class="number">4</span>);  <span class="comment">//该值总为0-3，对应四个搜索方向</span></span><br><span class="line">  <span class="keyword">int</span> offset = refMvdCands[fPosStep];   <span class="comment">//8中步长对应的偏置</span></span><br><span class="line">  <span class="keyword">if</span> ( pu.cu-&gt;slice-&gt;getPicHeader()-&gt;getDisFracMMVD() )</span><br><span class="line">  &#123;</span><br><span class="line">    offset &lt;&lt;= <span class="number">2</span>;</span><br><span class="line">  &#125;</span><br><span class="line">  <span class="keyword">const</span> <span class="keyword">int</span> refList0 = mmvdBaseMv[fPosBaseIdx][<span class="number">0</span>].refIdx;   <span class="comment">//每个初始MV的前向参考列表</span></span><br><span class="line">  <span class="keyword">const</span> <span class="keyword">int</span> refList1 = mmvdBaseMv[fPosBaseIdx][<span class="number">1</span>].refIdx;   <span class="comment">//每个初始MV的候选项参考列表</span></span><br><span class="line"></span><br><span class="line">  <span class="keyword">if</span> ((refList0 != <span class="number">-1</span>) &amp;&amp; (refList1 != <span class="number">-1</span>))   <span class="comment">//双向参考列表存在</span></span><br><span class="line">  &#123;</span><br><span class="line">    <span class="keyword">const</span> <span class="keyword">int</span> poc0 = slice.getRefPOC(REF_PIC_LIST_0, refList0);  <span class="comment">//前向参考帧的POC</span></span><br><span class="line">    <span class="keyword">const</span> <span class="keyword">int</span> poc1 = slice.getRefPOC(REF_PIC_LIST_1, refList1);   <span class="comment">//后向参考帧的POC</span></span><br><span class="line">    <span class="keyword">const</span> <span class="keyword">int</span> currPoc = slice.getPOC();   <span class="comment">//当前参考帧的POC</span></span><br><span class="line">      </span><br><span class="line">    <span class="comment">//每个MV的结构体里包含器搜索方向、以及搜索步长、然后赋值给tempMv数组</span></span><br><span class="line">    <span class="keyword">if</span> (fPosPosition == <span class="number">0</span>)</span><br><span class="line">    &#123;</span><br><span class="line">      tempMv[<span class="number">0</span>] = Mv(offset, <span class="number">0</span>);  <span class="comment">//右</span></span><br><span class="line">    &#125;</span><br><span class="line">    <span class="keyword">else</span> <span class="keyword">if</span> (fPosPosition == <span class="number">1</span>)</span><br><span class="line">    &#123;</span><br><span class="line">      tempMv[<span class="number">0</span>] = Mv(-offset, <span class="number">0</span>);  <span class="comment">//左</span></span><br><span class="line">    &#125;</span><br><span class="line">    <span class="keyword">else</span> <span class="keyword">if</span> (fPosPosition == <span class="number">2</span>)</span><br><span class="line">    &#123;</span><br><span class="line">      tempMv[<span class="number">0</span>] = Mv(<span class="number">0</span>, offset);   <span class="comment">//上</span></span><br><span class="line">    &#125;</span><br><span class="line">    <span class="keyword">else</span></span><br><span class="line">    &#123;</span><br><span class="line">      tempMv[<span class="number">0</span>] = Mv(<span class="number">0</span>, -offset);  <span class="comment">//下</span></span><br><span class="line">    &#125;</span><br><span class="line">      </span><br><span class="line">    <span class="comment">//前后参考帧属于同一帧</span></span><br><span class="line">    <span class="keyword">if</span> ((poc0 - currPoc) == (poc1 - currPoc))</span><br><span class="line">    &#123;</span><br><span class="line">      tempMv[<span class="number">1</span>] = tempMv[<span class="number">0</span>];  <span class="comment">//双向的MVD是一样的</span></span><br><span class="line">    &#125;</span><br><span class="line">    <span class="keyword">else</span> <span class="keyword">if</span> (<span class="built_in">abs</span>(poc1 - currPoc) &gt; <span class="built_in">abs</span>(poc0 - currPoc))  <span class="comment">//后向参考帧的POC大于前向参考帧的POC</span></span><br><span class="line">    &#123;</span><br><span class="line">      <span class="keyword">const</span> <span class="keyword">int</span> scale = PU::getDistScaleFactor(currPoc, poc0, currPoc, poc1);</span><br><span class="line">      tempMv[<span class="number">1</span>] = tempMv[<span class="number">0</span>];</span><br><span class="line">      <span class="keyword">const</span> <span class="keyword">bool</span> isL0RefLongTerm = slice.getRefPic(REF_PIC_LIST_0, refList0)-&gt;longTerm;</span><br><span class="line">      <span class="keyword">const</span> <span class="keyword">bool</span> isL1RefLongTerm = slice.getRefPic(REF_PIC_LIST_1, refList1)-&gt;longTerm;</span><br><span class="line">      <span class="keyword">if</span> (isL0RefLongTerm || isL1RefLongTerm)<span class="comment">//有其中一个是长期参考帧</span></span><br><span class="line">      &#123;</span><br><span class="line">        <span class="keyword">if</span> ((poc1 - currPoc)*(poc0 - currPoc) &gt; <span class="number">0</span>)</span><br><span class="line">        &#123;</span><br><span class="line">          tempMv[<span class="number">0</span>] = tempMv[<span class="number">1</span>];</span><br><span class="line">        &#125;</span><br><span class="line">        <span class="keyword">else</span></span><br><span class="line">        &#123;</span><br><span class="line">          tempMv[<span class="number">0</span>].<span class="built_in">set</span>(<span class="number">-1</span> * tempMv[<span class="number">1</span>].getHor(), <span class="number">-1</span> * tempMv[<span class="number">1</span>].getVer());</span><br><span class="line">        &#125;</span><br><span class="line">      &#125;</span><br><span class="line">      <span class="keyword">else</span>  <span class="comment">//都不是长期参考帧</span></span><br><span class="line">      tempMv[<span class="number">0</span>] = tempMv[<span class="number">1</span>].scaleMv(scale);</span><br><span class="line">    &#125;</span><br><span class="line">    <span class="keyword">else</span></span><br><span class="line">    &#123;</span><br><span class="line">      <span class="keyword">const</span> <span class="keyword">int</span> scale = PU::getDistScaleFactor(currPoc, poc1, currPoc, poc0);</span><br><span class="line">      <span class="keyword">const</span> <span class="keyword">bool</span> isL0RefLongTerm = slice.getRefPic(REF_PIC_LIST_0, refList0)-&gt;longTerm;</span><br><span class="line">      <span class="keyword">const</span> <span class="keyword">bool</span> isL1RefLongTerm = slice.getRefPic(REF_PIC_LIST_1, refList1)-&gt;longTerm;</span><br><span class="line">      <span class="keyword">if</span> (isL0RefLongTerm || isL1RefLongTerm)</span><br><span class="line">      &#123;</span><br><span class="line">        <span class="keyword">if</span> ((poc1 - currPoc)*(poc0 - currPoc) &gt; <span class="number">0</span>)<span class="comment">//若前后参考帧都来自当前帧的时域的同一侧，后向MMVDoffset与前向相等</span></span><br><span class="line">        &#123;</span><br><span class="line">          tempMv[<span class="number">1</span>] = tempMv[<span class="number">0</span>];</span><br><span class="line">        &#125;</span><br><span class="line">        <span class="keyword">else</span>  <span class="comment">//若前后参考帧来自不同侧，前向和后向的MMVDoffset相对称</span></span><br><span class="line">        &#123;</span><br><span class="line">          tempMv[<span class="number">1</span>].<span class="built_in">set</span>(<span class="number">-1</span> * tempMv[<span class="number">0</span>].getHor(), <span class="number">-1</span> * tempMv[<span class="number">0</span>].getVer());</span><br><span class="line">        &#125;</span><br><span class="line">      &#125;</span><br><span class="line">      <span class="keyword">else</span></span><br><span class="line">      tempMv[<span class="number">1</span>] = tempMv[<span class="number">0</span>].scaleMv(scale);</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    pu.interDir = <span class="number">3</span>; <span class="comment">//双向列表的DIr设置为3</span></span><br><span class="line">    <span class="comment">//这里为每个选中的MV选择起始MV然后加上然后加上步长和方向</span></span><br><span class="line">    pu.mv[REF_PIC_LIST_0] = mmvdBaseMv[fPosBaseIdx][<span class="number">0</span>].mv + tempMv[<span class="number">0</span>];  <span class="comment">//MMVD的前向MV</span></span><br><span class="line">    pu.refIdx[REF_PIC_LIST_0] = refList0;</span><br><span class="line">    pu.mv[REF_PIC_LIST_1] = mmvdBaseMv[fPosBaseIdx][<span class="number">1</span>].mv + tempMv[<span class="number">1</span>];    <span class="comment">//MMVD的后向MV</span></span><br><span class="line">    pu.refIdx[REF_PIC_LIST_1] = refList1;</span><br><span class="line">  &#125;</span><br><span class="line">  <span class="keyword">else</span> <span class="keyword">if</span> (refList0 != <span class="number">-1</span>)   <span class="comment">//如果只有前向列表存在</span></span><br><span class="line">  &#123;</span><br><span class="line">    <span class="keyword">if</span> (fPosPosition == <span class="number">0</span>)   <span class="comment">//右</span></span><br><span class="line">    &#123;</span><br><span class="line">      tempMv[<span class="number">0</span>] = Mv(offset, <span class="number">0</span>);</span><br><span class="line">    &#125;</span><br><span class="line">    <span class="keyword">else</span> <span class="keyword">if</span> (fPosPosition == <span class="number">1</span>)  <span class="comment">//左</span></span><br><span class="line">    &#123;</span><br><span class="line">      tempMv[<span class="number">0</span>] = Mv(-offset, <span class="number">0</span>); </span><br><span class="line">    &#125;</span><br><span class="line">    <span class="keyword">else</span> <span class="keyword">if</span> (fPosPosition == <span class="number">2</span>)  <span class="comment">//上</span></span><br><span class="line">    &#123;</span><br><span class="line">      tempMv[<span class="number">0</span>] = Mv(<span class="number">0</span>, offset);  </span><br><span class="line">    &#125;</span><br><span class="line">    <span class="keyword">else</span>   <span class="comment">//下</span></span><br><span class="line">    &#123;</span><br><span class="line">      tempMv[<span class="number">0</span>] = Mv(<span class="number">0</span>, -offset);</span><br><span class="line">    &#125;</span><br><span class="line">    pu.interDir = <span class="number">1</span>;   <span class="comment">//前向列表的DIr设置为1</span></span><br><span class="line">    pu.mv[REF_PIC_LIST_0] = mmvdBaseMv[fPosBaseIdx][<span class="number">0</span>].mv + tempMv[<span class="number">0</span>];</span><br><span class="line">    pu.refIdx[REF_PIC_LIST_0] = refList0;</span><br><span class="line">    pu.mv[REF_PIC_LIST_1] = Mv(<span class="number">0</span>, <span class="number">0</span>);</span><br><span class="line">    pu.refIdx[REF_PIC_LIST_1] = <span class="number">-1</span>;</span><br><span class="line">  &#125;</span><br><span class="line">  <span class="keyword">else</span> <span class="keyword">if</span> (refList1 != <span class="number">-1</span>)</span><br><span class="line">  &#123;</span><br><span class="line">    <span class="keyword">if</span> (fPosPosition == <span class="number">0</span>)</span><br><span class="line">    &#123;</span><br><span class="line">      tempMv[<span class="number">1</span>] = Mv(offset, <span class="number">0</span>);</span><br><span class="line">    &#125;</span><br><span class="line">    <span class="keyword">else</span> <span class="keyword">if</span> (fPosPosition == <span class="number">1</span>)</span><br><span class="line">    &#123;</span><br><span class="line">      tempMv[<span class="number">1</span>] = Mv(-offset, <span class="number">0</span>);</span><br><span class="line">    &#125;</span><br><span class="line">    <span class="keyword">else</span> <span class="keyword">if</span> (fPosPosition == <span class="number">2</span>)</span><br><span class="line">    &#123;</span><br><span class="line">      tempMv[<span class="number">1</span>] = Mv(<span class="number">0</span>, offset);</span><br><span class="line">    &#125;</span><br><span class="line">    <span class="keyword">else</span></span><br><span class="line">    &#123;</span><br><span class="line">      tempMv[<span class="number">1</span>] = Mv(<span class="number">0</span>, -offset);</span><br><span class="line">    &#125;</span><br><span class="line">    pu.interDir = <span class="number">2</span>;  <span class="comment">//后向类表的DIr设置为2</span></span><br><span class="line">    pu.mv[REF_PIC_LIST_0] = Mv(<span class="number">0</span>, <span class="number">0</span>);</span><br><span class="line">    pu.refIdx[REF_PIC_LIST_0] = <span class="number">-1</span>;</span><br><span class="line">    pu.mv[REF_PIC_LIST_1] = mmvdBaseMv[fPosBaseIdx][<span class="number">1</span>].mv + tempMv[<span class="number">1</span>];</span><br><span class="line">    pu.refIdx[REF_PIC_LIST_1] = refList1;</span><br><span class="line">  &#125;</span><br><span class="line"></span><br><span class="line">  pu.mmvdMergeFlag = <span class="literal">true</span>;</span><br><span class="line">  pu.mmvdMergeIdx = candIdx;</span><br><span class="line">  pu.mergeFlag = <span class="literal">true</span>;</span><br><span class="line">  pu.regularMergeFlag = <span class="literal">true</span>;</span><br><span class="line">  pu.mergeIdx = candIdx;</span><br><span class="line">  pu.mergeType = MRG_TYPE_DEFAULT_N;</span><br><span class="line">  pu.mvd[REF_PIC_LIST_0] = Mv();</span><br><span class="line">  pu.mvd[REF_PIC_LIST_1] = Mv();</span><br><span class="line">  pu.mvpIdx[REF_PIC_LIST_0] = NOT_VALID;</span><br><span class="line">  pu.mvpIdx[REF_PIC_LIST_1] = NOT_VALID;</span><br><span class="line">  pu.mvpNum[REF_PIC_LIST_0] = NOT_VALID;</span><br><span class="line">  pu.mvpNum[REF_PIC_LIST_1] = NOT_VALID;</span><br><span class="line">  pu.cu-&gt;imv = mmvdUseAltHpelIf[fPosBaseIdx] ? IMV_HPEL : <span class="number">0</span>;   <span class="comment">//MV使用半像素精度</span></span><br><span class="line"></span><br><span class="line">  pu.cu-&gt;BcwIdx = (interDirNeighbours[fPosBaseIdx] == <span class="number">3</span>) ? BcwIdx[fPosBaseIdx] : BCW_DEFAULT;   <span class="comment">//双向参考索引</span></span><br><span class="line"></span><br><span class="line">  <span class="keyword">for</span> (<span class="keyword">int</span> refList = <span class="number">0</span>; refList &lt; <span class="number">2</span>; refList++)</span><br><span class="line">  &#123;</span><br><span class="line">    <span class="keyword">if</span> (pu.refIdx[refList] &gt;= <span class="number">0</span>)</span><br><span class="line">    &#123;</span><br><span class="line">      pu.mv[refList].clipToStorageBitDepth();</span><br><span class="line">    &#125;</span><br><span class="line">  &#125;</span><br><span class="line"></span><br><span class="line"></span><br><span class="line">  PU::restrictBiPredMergeCandsOne(pu);</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<p>3.MMVD技术的实现代码</p>
+<figure class="highlight cpp"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br><span class="line">48</span><br></pre></td><td class="code"><pre><span class="line"> <span class="keyword">if</span> ( pu.cs-&gt;sps-&gt;getUseMMVD() )<span class="comment">//使用MMVD模式，这里选出最优的MMVD的Merge候选（初始MV+搜索方向+搜索步长）</span></span><br><span class="line">      &#123;</span><br><span class="line">        cu.mmvdSkip = <span class="literal">true</span>;</span><br><span class="line"><span class="meta">#<span class="meta-keyword">if</span> JVET_O0249_MERGE_SYNTAX</span></span><br><span class="line">        pu.regularMergeFlag = <span class="literal">true</span>;<span class="comment">//普通Merge列表依旧可用，因为初始的MV还是要从普通Merge中获取</span></span><br><span class="line"><span class="meta">#<span class="meta-keyword">endif</span></span></span><br><span class="line">        <span class="keyword">const</span> <span class="keyword">int</span> tempNum = (mergeCtx.numValidMergeCand &gt; <span class="number">1</span>) ? MMVD_ADD_NUM : MMVD_ADD_NUM &gt;&gt; <span class="number">1</span>;</span><br><span class="line">        <span class="comment">//对MMVD候选循环遍历</span></span><br><span class="line">        <span class="keyword">for</span> (<span class="keyword">int</span> mmvdMergeCand = <span class="number">0</span>; mmvdMergeCand &lt; tempNum; mmvdMergeCand++)<span class="comment">//循环64遍，前32种得到起始点1以及对应的8个步长</span></span><br><span class="line">                                                                             <span class="comment">//因为对于每种MV扩展都可以得到4*8种组合，因此两个起始点总共是64种组合</span></span><br><span class="line">        &#123;</span><br><span class="line">          <span class="keyword">int</span> baseIdx = mmvdMergeCand / MMVD_MAX_REFINE_NUM;<span class="comment">//候选基MV（即初始MV）索引，要么0 要么1，（这里就是两个初始MV的起点，每个初始MV有32种4*8的步长+方向的组合）</span></span><br><span class="line">          <span class="keyword">int</span> refineStep = (mmvdMergeCand - (baseIdx * MMVD_MAX_REFINE_NUM)) / <span class="number">4</span>;<span class="comment">//表示8种步长</span></span><br><span class="line">          <span class="keyword">if</span> (refineStep &gt;= m_pcEncCfg-&gt;getMmvdDisNum())</span><br><span class="line">            <span class="keyword">continue</span>;</span><br><span class="line">          <span class="comment">//设置MMVD候选的信息，得到每个扩展MV具体的搜索初始点以及每个方向以及对应的步长</span></span><br><span class="line">          mergeCtx.setMmvdMergeCandiInfo(pu, mmvdMergeCand);</span><br><span class="line"></span><br><span class="line">          PU::spanMotionInfo(pu, mergeCtx);</span><br><span class="line">          pu.mvRefine = <span class="literal">true</span>;</span><br><span class="line">          distParam.cur = singleMergeTempBuffer-&gt;Y();</span><br><span class="line">          pu.mmvdEncOptMode = (refineStep &gt; <span class="number">2</span> ? <span class="number">2</span> : <span class="number">1</span>);</span><br><span class="line">          CHECK(!pu.mmvdMergeFlag, <span class="string">"MMVD merge should be set"</span>);</span><br><span class="line">          <span class="comment">// Don't do chroma MC here</span></span><br><span class="line"></span><br><span class="line">          <span class="comment">//MMVD的Merge候选运动补偿计算预测值</span></span><br><span class="line">          m_pcInterSearch-&gt;motionCompensation(pu, *singleMergeTempBuffer, REF_PIC_LIST_X, <span class="literal">true</span>, <span class="literal">false</span>);</span><br><span class="line">          pu.mmvdEncOptMode = <span class="number">0</span>;</span><br><span class="line">          pu.mvRefine = <span class="literal">false</span>;</span><br><span class="line">          Distortion uiSad = distParam.distFunc(distParam);<span class="comment">//失真函数</span></span><br><span class="line"></span><br><span class="line">          m_CABACEstimator-&gt;getCtx() = ctxStart;</span><br><span class="line">          <span class="keyword">uint64_t</span> fracBits = m_pcInterSearch-&gt;xCalcPuMeBits(pu);<span class="comment">//计算码率</span></span><br><span class="line">          <span class="keyword">double</span> cost = (<span class="keyword">double</span>)uiSad + (<span class="keyword">double</span>)fracBits * sqrtLambdaForFirstPassIntra; <span class="comment">//计算RDcost</span></span><br><span class="line">          insertPos = <span class="number">-1</span>;</span><br><span class="line"></span><br><span class="line">          <span class="comment">//更新候选列表</span></span><br><span class="line">          updateCandList(ModeInfo(mmvdMergeCand, <span class="literal">false</span>, <span class="literal">true</span>, <span class="literal">false</span>), cost, RdModeList, candCostList, uiNumMrgSATDCand, &amp;insertPos);</span><br><span class="line">          <span class="keyword">if</span> (insertPos != <span class="number">-1</span>)</span><br><span class="line">          &#123;</span><br><span class="line">            <span class="keyword">for</span> (<span class="keyword">int</span> i = <span class="keyword">int</span>(RdModeList.size()) - <span class="number">1</span>; i &gt; insertPos; i--)</span><br><span class="line">            &#123;</span><br><span class="line">              swap(acMergeTempBuffer[i - <span class="number">1</span>], acMergeTempBuffer[i]);</span><br><span class="line">            &#125;</span><br><span class="line">            swap(singleMergeTempBuffer, acMergeTempBuffer[insertPos]);<span class="comment">//将代价更小的那个MV插入到Merge列表中</span></span><br><span class="line">          &#125;</span><br><span class="line">        &#125;</span><br><span class="line">      &#125;</span><br></pre></td></tr></table></figure>
+      
+
+      
+        <div class="page-reward">
+          <a href="javascript:;" class="page-reward-btn tooltip-top">
+            <div class="tooltip tooltip-east">
+            <span class="tooltip-item">
+              赏
+            </span>
+            <span class="tooltip-content">
+              <span class="tooltip-text">
+                <span class="tooltip-inner">
+                  <p class="reward-p"><i class="icon icon-quo-left"></i>谢谢你请我吃糖果<i class="icon icon-quo-right"></i></p>
+                  <div class="reward-box">
+                    
+                    <div class="reward-box-item">
+                      <img class="reward-img" src="/assets/支付宝.png">
+                      <span class="reward-type">支付宝</span>
+                    </div>
+                    
+                    
+                    <div class="reward-box-item">
+                      <img class="reward-img" src="/assets/微信收款.png">
+                      <span class="reward-type">微信</span>
+                    </div>
+                    
+                  </div>
+                </span>
+              </span>
+            </span>
+          </div>
+          </a>
+        </div>
+      
+    </div>
+    <div class="article-info article-info-index">
+      
+      
 	<div class="article-tag tagcloud">
 		<i class="icon-price-tags icon"></i>
 		<ul class="article-tag-list">
@@ -216,97 +292,135 @@
 		</ul>
 	</div>
 
-          
+      
 
+      
+
+      
+        
+<div class="share-btn share-icons tooltip-left">
+  <div class="tooltip tooltip-east">
+    <span class="tooltip-item">
+      <a href="javascript:;" class="share-sns share-outer">
+        <i class="icon icon-share"></i>
+      </a>
+    </span>
+    <span class="tooltip-content">
+      <div class="share-wrap">
+        <div class="share-icons">
+          <a class="weibo share-sns" href="javascript:;" data-type="weibo">
+            <i class="icon icon-weibo"></i>
+          </a>
+          <a class="weixin share-sns wxFab" href="javascript:;" data-type="weixin">
+            <i class="icon icon-weixin"></i>
+          </a>
+          <a class="qq share-sns" href="javascript:;" data-type="qq">
+            <i class="icon icon-qq"></i>
+          </a>
+          <a class="douban share-sns" href="javascript:;" data-type="douban">
+            <i class="icon icon-douban"></i>
+          </a>
+          <a class="qzone share-sns" href="javascript:;" data-type="qzone">
+            <i class="icon icon-qzone"></i>
+          </a>
+          <a class="facebook share-sns" href="javascript:;" data-type="facebook">
+            <i class="icon icon-facebook"></i>
+          </a>
+          <a class="twitter share-sns" href="javascript:;" data-type="twitter">
+            <i class="icon icon-twitter"></i>
+          </a>
+          <a class="google share-sns" href="javascript:;" data-type="google">
+            <i class="icon icon-google"></i>
+          </a>
         </div>
-        <div class="clearfix"></div>
-    </header>
+      </div>
+    </span>
+  </div>
+</div>
+
+<div class="page-modal wx-share js-wx-box">
+    <a class="close js-modal-close" href="javascript:;"><i class="icon icon-close"></i></a>
+    <p>扫一扫，分享到微信</p>
+    <div class="wx-qrcode">
+      <img src="//api.qrserver.com/v1/create-qr-code/?size=150x150&data=http://jiabo-cohen.github.io/2020/07/01/H-266-VVC%E4%B8%AD%E5%B8%A7%E9%97%B4%E9%A2%84%E6%B5%8BMMVD%E6%8A%80%E6%9C%AF/" alt="微信分享二维码">
+    </div>
+</div>
+
+<div class="mask js-mask"></div>
+      
+      <div class="clearfix"></div>
+    </div>
   </div>
 </article>
+
   
-    
-    
-    <article class="archive-article archive-type-post">
-  <div class="archive-article-inner">
-    <header class="archive-article-header">
-      	<div class="article-meta">
-	      	
-<a href="/2020/06/29/VVC%E5%B8%A7%E9%97%B4%E9%A2%84%E6%B5%8B%E4%B8%AD%E6%89%A9%E5%B1%95merge%E6%A8%A1%E5%BC%8F/" class="archive-article-date">
-  	<time datetime="2020-06-29T08:47:48.000Z" itemprop="datePublished"><i class="icon-calendar icon"></i>2020-06-29</time>
-</a>
+<nav id="article-nav">
+  
+  
+    <a href="/2020/06/29/VVC%E5%B8%A7%E9%97%B4%E9%A2%84%E6%B5%8B%E4%B8%AD%E6%89%A9%E5%B1%95merge%E6%A8%A1%E5%BC%8F/" id="article-nav-older" class="article-nav-link-wrap">
+      <div class="article-nav-title">VVC帧间预测中扩展merge模式</div>
+      <i class="icon-circle-right"></i>
+    </a>
+  
+</nav>
+
+
+<aside class="wrap-side-operation">
+    <div class="mod-side-operation">
+        
+        <div class="jump-container" id="js-jump-container" style="display:none;">
+            <a href="javascript:void(0)" class="mod-side-operation__jump-to-top">
+                <i class="icon-font icon-back"></i>
+            </a>
+            <div id="js-jump-plan-container" class="jump-plan-container" style="top: -11px;">
+                <i class="icon-font icon-plane jump-plane"></i>
+            </div>
         </div>
-    	 
-  
-    <h1 itemprop="name">
-      <a class="archive-article-title" href="/2020/06/29/VVC%E5%B8%A7%E9%97%B4%E9%A2%84%E6%B5%8B%E4%B8%AD%E6%89%A9%E5%B1%95merge%E6%A8%A1%E5%BC%8F/">VVC帧间预测中扩展merge模式</a>
-    </h1>
-  
-
-        <div class="article-info info-on-right">
-          
-	<div class="article-tag tagcloud">
-		<i class="icon-price-tags icon"></i>
-		<ul class="article-tag-list">
-			 
-        		<li class="article-tag-list-item">
-        			<a href="javascript:void(0)" class="js-tag article-tag-list-link color5">视频编码</a>
-        		</li>
-      		
-		</ul>
-	</div>
-
-          
-
+        
+        
+        <div class="toc-container tooltip-left">
+            <i class="icon-font icon-category"></i>
+            <div class="tooltip tooltip-east">
+                <span class="tooltip-item">
+                </span>
+                <span class="tooltip-content">
+                    <div class="toc-article">
+                    <ol class="toc"><li class="toc-item toc-level-3"><a class="toc-link" href="#一、前言"><span class="toc-number">1.</span> <span class="toc-text">一、前言</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#二、具体实现步骤"><span class="toc-number">2.</span> <span class="toc-text">二、具体实现步骤</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#三、相关代码的详细分析（VTM8-0）"><span class="toc-number">3.</span> <span class="toc-text">三、相关代码的详细分析（VTM8.0）</span></a></li></ol>
+                    </div>
+                </span>
+            </div>
         </div>
-        <div class="clearfix"></div>
-    </header>
-  </div>
-</article>
+        
+    </div>
+</aside>
+
+
+
   
-    
-    
-    <article class="archive-article archive-type-post">
-  <div class="archive-article-inner">
-    <header class="archive-article-header">
-      	<div class="article-meta">
-	      	
-<a href="/2020/06/28/VVC%E5%B8%A7%E9%97%B4%E9%A2%84%E6%B5%8B%E4%B8%8EHEVC%E5%B8%A7%E9%97%B4%E6%8A%80%E6%9C%AF%E5%90%8E%E7%9A%84%E6%94%B9%E8%BF%9B/" class="archive-article-date">
-  	<time datetime="2020-06-28T03:13:39.000Z" itemprop="datePublished"><i class="icon-calendar icon"></i>2020-06-28</time>
-</a>
-        </div>
-    	 
   
-    <h1 itemprop="name">
-      <a class="archive-article-title" href="/2020/06/28/VVC%E5%B8%A7%E9%97%B4%E9%A2%84%E6%B5%8B%E4%B8%8EHEVC%E5%B8%A7%E9%97%B4%E6%8A%80%E6%9C%AF%E5%90%8E%E7%9A%84%E6%94%B9%E8%BF%9B/">VVC帧间预测与HEVC帧间技术的改进</a>
-    </h1>
   
 
-        <div class="article-info info-on-right">
-          
-	<div class="article-tag tagcloud">
-		<i class="icon-price-tags icon"></i>
-		<ul class="article-tag-list">
-			 
-        		<li class="article-tag-list-item">
-        			<a href="javascript:void(0)" class="js-tag article-tag-list-link color5">视频编码</a>
-        		</li>
-      		
-		</ul>
-	</div>
-
-          
-
-        </div>
-        <div class="clearfix"></div>
-    </header>
-  </div>
-</article>
-  
-  
-    </div></section>
   
 
-    
+  
+
+  
+  <div id="gitment-ctn"></div> 
+<link rel="stylesheet" href="//imsun.github.io/gitment/style/default.css">
+<script src="//imsun.github.io/gitment/dist/gitment.browser.js"></script>
+<script>
+var gitment = new Gitment({
+  id: "http://yoursite.com/2020/07/01/H-266-VVC%E4%B8%AD%E5%B8%A7%E9%97%B4%E9%A2%84%E6%B5%8BMMVD%E6%8A%80%E6%9C%AF/",
+  owner: 'jiabo-Cohen',
+  repo: 'jiabo-Cohen.github.io ',
+  oauth: {
+    client_id: '41f100df0577df00f359',
+    client_secret: '52325cac463b7af10537ebdfa26df4a64c843de5',
+  },
+})
+gitment.render('gitment-ctn')
+</script>
+  
 
 
           </div>
@@ -344,9 +458,9 @@
 	var yiliaConfig = {
 		mathjax: true,
 		isHome: false,
-		isPost: false,
+		isPost: true,
 		isArchive: false,
-		isTag: true,
+		isTag: false,
 		isCategory: false,
 		open_in_new: false,
 		toc_hide_index: true,
